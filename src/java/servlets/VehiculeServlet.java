@@ -17,8 +17,12 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import model.Vehicule;
 
 /**
@@ -92,13 +96,49 @@ public class VehiculeServlet extends HttpServlet {
     protected void save(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         model = new Vehicule();
-        model.setMarque(request.getParameter("marque"));
-        model.setModele(request.getParameter("modele"));
-        model.setCouleur(request.getParameter("couleur"));
-        model.setNoMoteur(request.getParameter("noMoteur"));
-        model.setNbCylindre(Integer.parseInt(request.getParameter("nbCylindre")));
-        model.setTypeTransmission(request.getParameter("typeTransmission"));
-        model.setTypeEssence(request.getParameter("typeEssence"));
+        // Map pour stocker les messages d'erreur
+        Map<String, String> errors = new HashMap<>();
+        
+        if(!request.getParameter("marque").isEmpty()){
+            model.setMarque(request.getParameter("marque"));
+        } else {
+            errors.put("marque", "Erreur d'insertion");
+        }
+        System.out.println(model.getMarque());
+        if(!request.getParameter("modele").isEmpty()){
+            model.setModele(request.getParameter("modele"));
+        } else {
+            errors.put("modele", "Erreur d'insertion");
+        }
+        if(!request.getParameter("couleur").isEmpty()){
+            model.setCouleur(request.getParameter("couleur"));
+        } else {
+            errors.put("couleur", "Erreur d'insertion");
+        }
+        
+        if(!request.getParameter("noMoteur").isEmpty()){
+            model.setNoMoteur(request.getParameter("noMoteur"));
+        } else {
+            errors.put("noMoteur", "Erreur d'insertion");
+        }
+        
+        if(testRegex(request.getParameter("nbCylindre"), "^\\d+$")){
+            model.setNbCylindre(Integer.parseInt(request.getParameter("nbCylindre")));
+        }else{
+            errors.put("nbCylindre", "Erreur d'insertion");
+        }
+        
+        if(!request.getParameter("typeTransmission").isEmpty()){
+            model.setTypeTransmission(request.getParameter("typeTransmission"));
+        } else {
+            errors.put("typeTransmission", "Erreur d'insertion");
+        }
+        
+        if(!request.getParameter("typeEssence").isEmpty()){
+            model.setTypeEssence(request.getParameter("typeEssence"));
+        } else {
+            errors.put("typeEssence", "Erreur d'insertion");
+        }
         // Récupérez et traitez les autres paramètres ici
         
         // Récupérez l'image
@@ -113,16 +153,65 @@ public class VehiculeServlet extends HttpServlet {
                 }
                 model.setPhotoVehicule(byteArrayOutputStream.toByteArray());
             }
+        } else{
+            errors.put("photo", "Erreur d'insertion");
         }
-        model.setPlaqueImmatriculation(request.getParameter("plaqueImmatriculation"));
-        model.setNomProprietaire(request.getParameter("nomProprietaire"));
-        model.setPrenomProprietaire(request.getParameter("prenomProprietaire"));
-        model.setSexeProprietaire(request.getParameter("sexeProprietaire"));
-        model.setTelProprietaire(request.getParameter("telProprietaire"));
-        model.setAdresseProprietaire(request.getParameter("adresseProprietaire"));
-        model.setTypePieceProp(request.getParameter("typePieceProp"));
-        model.setNoPiece(request.getParameter("noPiece"));
-        model.setAnnee(Integer.parseInt(request.getParameter("annee")));
+        
+        if(!request.getParameter("plaqueImmatriculation").isEmpty()){
+            model.setPlaqueImmatriculation(request.getParameter("plaqueImmatriculation"));
+        } else {
+            errors.put("plaqueImmatriculation", "Erreur d'insertion");
+        }
+        
+        if(testRegex(request.getParameter("nomProprietaire"), "^[A-Z]+(?:[- ][A-Z]+)*$")){
+            model.setNomProprietaire(request.getParameter("nomProprietaire"));
+        }else{
+            errors.put("nomProprietaire", "Erreur d'insertion");
+        }
+        
+        if(testRegex(request.getParameter("prenomProprietaire"), "^[A-Z][a-zÀ-ÿ]*(?:[-\\s][A-Z][a-zÀ-ÿ]*)*$")){
+            model.setPrenomProprietaire(request.getParameter("prenomProprietaire"));
+        }else{
+            errors.put("prenomProprietaire", "Erreur d'insertion");
+        }
+        
+        if(!request.getParameter("sexeProprietaire").isEmpty()){
+            model.setSexeProprietaire(request.getParameter("sexeProprietaire"));
+        } else {
+            errors.put("sexeProprietaire", "Erreur d'insertion");
+        }
+        
+        if(testRegex(request.getParameter("telProprietaire"), "^(3[0-9]|4[0-46-9]|55)\\d{6}$")){
+            model.setTelProprietaire(request.getParameter("telProprietaire"));
+        }else{
+            errors.put("telProprietaire", "Erreur d'insertion");
+        }
+        
+        if(!request.getParameter("adresseProprietaire").isEmpty()){
+            model.setAdresseProprietaire(request.getParameter("adresseProprietaire"));
+        } else {
+            errors.put("adresseProprietaire", "Erreur d'insertion");
+        }
+        
+        if(!request.getParameter("typePieceProp").isEmpty()){
+            model.setTypePieceProp(request.getParameter("typePieceProp"));
+        } else {
+            errors.put("typePieceProp", "Erreur d'insertion");
+        }
+        
+        if(!request.getParameter("noPiece").isEmpty()){
+            model.setNoPiece(request.getParameter("noPiece"));
+        } else {
+            errors.put("noPiece", "Erreur d'insertion");
+        }
+        
+        if(testRegex(request.getParameter("annee"), "^\\d{4}$")){
+            model.setAnnee(Integer.parseInt(request.getParameter("annee")));
+        }else{
+            errors.put("annee", "Erreur d'insertion");
+        }
+        
+        
         if(request.getParameter("alerte") != null){
             if(request.getParameter("alerte").equalsIgnoreCase("true")){
                 model.setAlerte(true);
@@ -131,17 +220,44 @@ public class VehiculeServlet extends HttpServlet {
                 model.setAlerte(false);
             }
         }
-
-        model.setCourrierProprietaire(request.getParameter("courrierProprietaire"));
-        LocalDate dateAlerte = LocalDate.parse(request.getParameter("dateAlerte"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        model.setDateAlerte(dateAlerte);
-        try {
-            if (dao.save(model) > 0) {
-                System.out.println("OK!!!");
-            }
-        }catch (ClassNotFoundException ex) {
-            System.out.println("Erreur 2:" + ex.getMessage());
+        
+        if(testRegex(request.getParameter("courrielProprietaire"), "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")){
+            model.setCourrielProprietaire(request.getParameter("courrielProprietaire"));
+        }else{
+            errors.put("courrielProprietaire", "Erreur d'insertion");
         }
+        
+        if(!request.getParameter("dateAlerte").isEmpty()){
+            LocalDate dateAlerte = LocalDate.parse(request.getParameter("dateAlerte"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            model.setDateAlerte(dateAlerte);
+        }else{
+            model.setDateAlerte(null);
+        }
+        
+        if(!errors.isEmpty()){
+            request.setAttribute("errors", errors);
+            // Redirection vers la page du formulaire
+            request.getRequestDispatcher("/vehicule/Enregistrement_Vehicule.jsp").forward(request, response);
+        }else{
+            try {
+                if (dao.save(model) > 0) {
+                    System.out.println("OK!!!");
+                }
+            }catch (ClassNotFoundException ex) {
+                System.out.println("Erreur 2:" + ex.getMessage());
+            }
+        }      
+    }
+    
+    private boolean testRegex(String str1, String str2){
+        
+        // Compile le regex en un objet Pattern
+        Pattern pattern = Pattern.compile(str2);
+        
+        // Crée un objet Matcher pour effectuer la correspondance
+        Matcher matcher = pattern.matcher(str1);
+        
+        return matcher.matches();
     }
 
     /**

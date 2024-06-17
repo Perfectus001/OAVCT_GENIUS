@@ -31,7 +31,7 @@ public class Vehicule {
     private String typePieceProp;
     private String noPiece;
     private int annee;
-    private String courrierProprietaire;
+    private String courrielProprietaire;
     private boolean alerte;
     private LocalDate dateAlerte;
     private Date dateEnregistrement;
@@ -180,12 +180,12 @@ public class Vehicule {
         this.annee = annee;
     }
 
-    public String getCourrierProprietaire() {
-        return courrierProprietaire;
+    public String getCourrielProprietaire() {
+        return courrielProprietaire;
     }
 
-    public void setCourrierProprietaire(String courrierProprietaire) {
-        this.courrierProprietaire = courrierProprietaire;
+    public void setCourrielProprietaire(String courrielProprietaire) {
+        this.courrielProprietaire = courrielProprietaire;
     }
 
     public boolean isAlerte() {
@@ -223,7 +223,7 @@ public class Vehicule {
                     String prenomProprietaire, String sexeProprietaire, 
                     String telProprietaire, String adresseProprietaire, 
                     String typePieceProp, String noPiece, int annee, 
-                    String courrierProprietaire, boolean alerte, 
+                    String courrielProprietaire, boolean alerte, 
                     LocalDate dateAlerte, Date dateEnregistrement) {
         this.id = id;
         this.marque = marque;
@@ -243,7 +243,7 @@ public class Vehicule {
         this.typePieceProp = typePieceProp;
         this.noPiece = noPiece;
         this.annee = annee;
-        this.courrierProprietaire = courrierProprietaire;
+        this.courrielProprietaire = courrielProprietaire;
         this.alerte = alerte;
         this.dateAlerte = dateAlerte;
         this.dateEnregistrement = dateEnregistrement;

@@ -50,7 +50,7 @@ ResultSet rs=null;
             pst.setString(16, vehicule.getTypePieceProp());
             pst.setString(17, vehicule.getNoPiece());
             pst.setInt(18, vehicule.getAnnee());
-            pst.setString(19, vehicule.getCourrierProprietaire());
+            pst.setString(19, vehicule.getCourrielProprietaire());
             pst.setBoolean(20, vehicule.isAlerte());
             pst.setDate(21, Date.valueOf(vehicule.getDateAlerte()));
             pst.setDate(22, new java.sql.Date(System.currentTimeMillis()));  
