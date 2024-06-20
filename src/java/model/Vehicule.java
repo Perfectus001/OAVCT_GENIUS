@@ -5,8 +5,9 @@
 package model;
 
 import java.time.LocalDate;
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -34,7 +35,8 @@ public class Vehicule {
     private String courrielProprietaire;
     private boolean alerte;
     private LocalDate dateAlerte;
-    private Date dateEnregistrement;
+    private Timestamp dateEnregistrement;
+    
 
     public String getId() {
         return id;
@@ -204,11 +206,11 @@ public class Vehicule {
         this.dateAlerte = dateAlerte;
     }
 
-    public Date getDateEnregistrement() {
+    public Timestamp getDateEnregistrement() {
         return dateEnregistrement;
     }
 
-    public void setDateEnregistrement(Date dateEnregistrement) {
+    public void setDateEnregistrement(Timestamp dateEnregistrement) {
         this.dateEnregistrement = dateEnregistrement;
     }
     
@@ -224,7 +226,7 @@ public class Vehicule {
                     String telProprietaire, String adresseProprietaire, 
                     String typePieceProp, String noPiece, int annee, 
                     String courrielProprietaire, boolean alerte, 
-                    LocalDate dateAlerte, Date dateEnregistrement) {
+                    LocalDate dateAlerte, Timestamp dateEnregistrement) {
         this.id = id;
         this.marque = marque;
         this.couleur = couleur;
@@ -256,5 +258,18 @@ public class Vehicule {
                 this.noMoteur.substring(0,2)+
                 r.nextInt(9999);
         return code.toUpperCase();
+    }
+    
+    public long calculeDifferenceHeure() {
+        //Recuperation de la date et de l'heure actuelle
+        Timestamp dateActuelle = new Timestamp(System.currentTimeMillis());
+        
+        // Obtenir la différence en millisecondes entre les deux Timestamp
+        long diffInMillis = Math.abs(dateActuelle.getTime() - this.dateEnregistrement.getTime());
+
+        // Convertir la différence en millisecondes en heures
+        long diffHeure = TimeUnit.MILLISECONDS.toSeconds(diffInMillis);
+
+        return diffHeure;
     }
 }

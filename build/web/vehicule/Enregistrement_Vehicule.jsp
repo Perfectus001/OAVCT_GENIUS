@@ -165,10 +165,10 @@
                     <br><span style="color: red;"><%= errors.get("alerte") %></span>
                 <% } %>
             </p>
-            <p>
+            <!--<p>
                 <label for="dateAlerte">Date Alerte</label>
                 <input type="date" name="dateAlerte">
-            </p>
+            </p>-->
             <p>
                 <input type="submit" name="opt" value="Enregistrer">
             </p> 
