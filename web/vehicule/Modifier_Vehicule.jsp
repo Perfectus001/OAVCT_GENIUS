@@ -7,6 +7,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.util.Map"%>
 <%@page import="model.Vehicule" %>
+<%@page import="model.Proprietaire" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -17,10 +18,12 @@
         <% 
         Map<String, String> errors = (Map<String, String>) request.getAttribute("errors");
         Vehicule v = (Vehicule)request.getAttribute("vehicules");
+        Proprietaire p = (Proprietaire)request.getAttribute("proprietaires");
         %>
 
         <form action="${pageContext.request.contextPath}/VehiculeServlet" method="post" enctype="multipart/form-data">
             
+            <input type="hidden" name="id2" value="<%=p!=null?p.getId():""%>">
             <input type="hidden" name="id" value="<%=v!=null?v.getId():""%>">
             <p>
                 <label for="marque">Marque</label>
@@ -93,14 +96,14 @@
             </p>
             <p>
                 <label for="nomProprietaire">Nom</label>
-                <input type="text" name="nomProprietaire" value="<%=v!=null?v.getNomProprietaire():""%>">
+                <input type="text" name="nomProprietaire" value="<%=p!=null?p.getNom():""%>">
                 <% if (errors != null && errors.containsKey("nomProprietaire")) { %>
                     <br><span style="color: red;"><%= errors.get("nomProprietaire") %></span>
                 <% } %>
             </p>
             <p>
                 <label for="prenomProprietaire">Prenom</label>
-                <input type="text" name="prenomProprietaire" value="<%=v!=null?v.getPrenomProprietaire():""%>">
+                <input type="text" name="prenomProprietaire" value="<%=p!=null?p.getPrenom():""%>">
                 <% if (errors != null && errors.containsKey("prenomProprietaire")) { %>
                     <br><span style="color: red;"><%= errors.get("prenomProprietaire") %></span>
                 <% } %>
@@ -108,8 +111,8 @@
             <p>
                 <label for="sexeProprietaire">sexe</label>
                 <select name="sexeProprietaire">
-                    <option value="M" <%= v!=null && v.getSexeProprietaire().equalsIgnoreCase("M")?"selected":""%>>M</option>
-                    <option value="F"<%= v!=null && v.getSexeProprietaire().equalsIgnoreCase("F")?"selected":""%>>F</option>
+                    <option value="M" <%= p!=null && p.getSexe().equalsIgnoreCase("M")?"selected":""%>>M</option>
+                    <option value="F"<%= p!=null && p.getSexe().equalsIgnoreCase("F")?"selected":""%>>F</option>
                 </select>
                 <% if (errors != null && errors.containsKey("sexeProprietaire")) { %>
                     <br><span style="color: red;"><%= errors.get("sexeProprietaire") %></span>
@@ -117,14 +120,14 @@
             </p>
             <p>
                 <label for="telProprietaire">Telephone</label>
-                <input type="text" name="telProprietaire" value="<%=v!=null?v.getTelProprietaire():""%>">
+                <input type="text" name="telProprietaire" value="<%=p!=null?p.getTel():""%>">
                 <% if (errors != null && errors.containsKey("telProprietaire")) { %>
                     <br><span style="color: red;"><%= errors.get("telProprietaire") %></span>
                 <% } %>
             </p>
             <p>
                 <label for="adresseProprietaire">Adresse</label>
-                <input type="text" name="adresseProprietaire" value="<%=v!=null?v.getAdresseProprietaire():""%>">
+                <input type="text" name="adresseProprietaire" value="<%=p!=null?p.getAdresse():""%>">
                 <% if (errors != null && errors.containsKey("adresseProprietaire")) { %>
                     <br><span style="color: red;"><%= errors.get("adresseProprietaire") %></span>
                 <% } %>
@@ -132,9 +135,9 @@
             <p>
                 <label for="typePieceProp">Piece Proprietaire</label>
                 <select name="typePieceProp">
-                    <option value="licence" <%= v!=null && v.getTypePieceProp().equalsIgnoreCase("licence")?"selected":""%>>Licence</option>
-                    <option value="CarteIdentification" <%= v!=null && v.getTypePieceProp().equalsIgnoreCase("CarteIdentification")?"selected":""%>>Carte d'Identification</option>
-                    <option value="Passeport" <%= v!=null && v.getTypePieceProp().equalsIgnoreCase("Passeport")?"selected":""%>>Passeport</option>
+                    <option value="licence" <%= p!=null && p.getTypePiece().equalsIgnoreCase("licence")?"selected":""%>>Licence</option>
+                    <option value="CarteIdentification" <%= p!=null && p.getTypePiece().equalsIgnoreCase("CarteIdentification")?"selected":""%>>Carte d'Identification</option>
+                    <option value="Passeport" <%= p!=null && p.getTypePiece().equalsIgnoreCase("Passeport")?"selected":""%>>Passeport</option>
                 </select>
                 <% if (errors != null && errors.containsKey("typePieceProp")) { %>
                     <br><span style="color: red;"><%= errors.get("typePieceProp") %></span>
@@ -142,7 +145,7 @@
             </p>
             <p>
                 <label for="noPiece">No. Piece</label>
-                <input type="text" name="noPiece" value="<%=v!=null?v.getNoPiece():""%>">
+                <input type="text" name="noPiece" value="<%=p!=null?p.getNoPiece():""%>">
                 <% if (errors != null && errors.containsKey("noPiece")) { %>
                     <br><span style="color: red;"><%= errors.get("noPiece") %></span>
                 <% } %>
@@ -156,12 +159,12 @@
             </p>
             <p>
                 <label for="courrielProprietaire">courriel</label>
-                <input type="text" name="courrielProprietaire" value="<%=v!=null?v.getCourrielProprietaire():""%>">
+                <input type="text" name="courrielProprietaire" value="<%=p!=null?p.getCourriel():""%>">
                 <% if (errors != null && errors.containsKey("courrielProprietaire")) { %>
                     <br><span style="color: red;"><%= errors.get("courrielProprietaire") %></span>
                 <% } %>
             </p>
-            <p>
+           <p>
                 <label for="alerte">Alerte</label>
                 <input type="radio" name="alerte" value="true" <%= v!=null && v.isAlerte()?"checked":""%>>
                 <input type="radio" name="alerte" value="false" <%= v!=null && v.isAlerte()?"":"checked"%>>

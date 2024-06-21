@@ -4,6 +4,7 @@
  */
 package servlets;
 
+import dao.ProprietaireDao;
 import dao.VehiculeDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -26,6 +27,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import model.Vehicule;
+import model.Proprietaire;
 
 /**
  *
@@ -44,7 +46,9 @@ import model.Vehicule;
 public class VehiculeServlet extends HttpServlet {
 
     Vehicule model = null;
+    Proprietaire modelp = null;
     VehiculeDao dao = new VehiculeDao();
+    ProprietaireDao pdao = new ProprietaireDao();
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
@@ -72,8 +76,12 @@ public class VehiculeServlet extends HttpServlet {
                         Vehicule vehicule = dao.get(id);
                         
                         if(vehicule != null){
-                            request.setAttribute("vehicules", vehicule);
-                            request.getRequestDispatcher("/vehicule/Recherche_Vehicule.jsp?").forward(request, response);
+                            Proprietaire proprietaire = pdao.get(vehicule.getIdProprietaire());
+                            if (proprietaire != null) {
+                                request.setAttribute("proprietaires", proprietaire);
+                                request.setAttribute("vehicules", vehicule);
+                                request.getRequestDispatcher("/vehicule/Recherche_Vehicule.jsp?").forward(request, response);
+                            }
                         }
                         
                     } catch (SQLException ex) {
@@ -88,8 +96,12 @@ public class VehiculeServlet extends HttpServlet {
                         Vehicule vehicule = dao.get(id);
                         
                         if(vehicule != null){
-                            request.setAttribute("vehicules", vehicule);
-                            request.getRequestDispatcher("/vehicule/Modifier_Vehicule.jsp?").forward(request, response);
+                            Proprietaire proprietaire = pdao.get(vehicule.getIdProprietaire());
+                            if (proprietaire != null) {
+                                request.setAttribute("proprietaires", proprietaire);
+                                request.setAttribute("vehicules", vehicule);
+                                request.getRequestDispatcher("/vehicule/Modifier_Vehicule.jsp?").forward(request, response);
+                            }
                         }
                         
                     } catch (SQLException ex) {
@@ -190,7 +202,7 @@ public class VehiculeServlet extends HttpServlet {
                 {
                     try {
                         save(request,response);
-                        display(request,response);
+                        //display(request,response);
                     } catch (SQLException ex) {
                         Logger.getLogger(VehiculeServlet.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -222,6 +234,7 @@ public class VehiculeServlet extends HttpServlet {
     protected void save(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         model = new Vehicule();
+        modelp = new Proprietaire();
         // Map pour stocker les messages d'erreur
         Map<String, String> errors = new HashMap<>();
         
@@ -290,43 +303,43 @@ public class VehiculeServlet extends HttpServlet {
         }
         
         if(testRegex(request.getParameter("nomProprietaire"), "^[A-Z]+(?:[- ][A-Z]+)*$")){
-            model.setNomProprietaire(request.getParameter("nomProprietaire"));
+            modelp.setNom(request.getParameter("nomProprietaire"));
         }else{
             errors.put("nomProprietaire", "Erreur d'insertion");
         }
         
         if(testRegex(request.getParameter("prenomProprietaire"), "^[A-Z][a-zÀ-ÿ]*(?:[-\\s][A-Z][a-zÀ-ÿ]*)*$")){
-            model.setPrenomProprietaire(request.getParameter("prenomProprietaire"));
+            modelp.setPrenom(request.getParameter("prenomProprietaire"));
         }else{
             errors.put("prenomProprietaire", "Erreur d'insertion");
         }
         
         if(!request.getParameter("sexeProprietaire").isEmpty()){
-            model.setSexeProprietaire(request.getParameter("sexeProprietaire"));
+            modelp.setSexe(request.getParameter("sexeProprietaire"));
         } else {
             errors.put("sexeProprietaire", "Erreur d'insertion");
         }
         
         if(testRegex(request.getParameter("telProprietaire"), "^(3[0-9]|4[0-46-9]|55)\\d{6}$")){
-            model.setTelProprietaire(request.getParameter("telProprietaire"));
+            modelp.setTel(request.getParameter("telProprietaire"));
         }else{
             errors.put("telProprietaire", "Erreur d'insertion");
         }
         
         if(!request.getParameter("adresseProprietaire").isEmpty()){
-            model.setAdresseProprietaire(request.getParameter("adresseProprietaire"));
+            modelp.setAdresse(request.getParameter("adresseProprietaire"));
         } else {
             errors.put("adresseProprietaire", "Erreur d'insertion");
         }
         
         if(!request.getParameter("typePieceProp").isEmpty()){
-            model.setTypePieceProp(request.getParameter("typePieceProp"));
+            modelp.setTypePiece(request.getParameter("typePieceProp"));
         } else {
             errors.put("typePieceProp", "Erreur d'insertion");
         }
         
         if(!request.getParameter("noPiece").isEmpty()){
-            model.setNoPiece(request.getParameter("noPiece"));
+            modelp.setNoPiece(request.getParameter("noPiece"));
         } else {
             errors.put("noPiece", "Erreur d'insertion");
         }
@@ -348,17 +361,10 @@ public class VehiculeServlet extends HttpServlet {
         }
         
         if(testRegex(request.getParameter("courrielProprietaire"), "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")){
-            model.setCourrielProprietaire(request.getParameter("courrielProprietaire"));
+            modelp.setCourriel(request.getParameter("courrielProprietaire"));
         }else{
             errors.put("courrielProprietaire", "Erreur d'insertion");
         }
-        
-        /*if(!request.getParameter("dateAlerte").isEmpty()){
-            LocalDate dateAlerte = LocalDate.parse(request.getParameter("dateAlerte"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            model.setDateAlerte(dateAlerte);
-        }else{
-            model.setDateAlerte(null);
-        }*/
         
         if(!errors.isEmpty()){
             request.setAttribute("errors", errors);
@@ -366,11 +372,18 @@ public class VehiculeServlet extends HttpServlet {
             request.getRequestDispatcher("/vehicule/Enregistrement_Vehicule.jsp").forward(request, response);
         }else{
             try {
-                if (dao.save(model) > 0) {
-                    System.out.println("OK!!!");
+                String idProprietaire = pdao.saveP(modelp);
+                if(idProprietaire != null){
+                    try {
+                        if (dao.saveV(model, idProprietaire) > 0) {
+                            System.out.println("OK!!!");
+                        }
+                    }catch (ClassNotFoundException ex) {
+                        System.out.println("Erreur 2:" + ex.getMessage());
+                    }
                 }
-            }catch (ClassNotFoundException ex) {
-                System.out.println("Erreur 2:" + ex.getMessage());
+            } catch (ClassNotFoundException ex) {
+                System.out.println("Erreur Proprietaire:" + ex.getMessage());
             }
         }      
     }
@@ -378,10 +391,13 @@ public class VehiculeServlet extends HttpServlet {
         protected void update(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         model = new Vehicule();
+        modelp = new Proprietaire();
         // Map pour stocker les messages d'erreur
         Map<String, String> errors = new HashMap<>();
         
         model.setId(request.getParameter("id"));
+        System.out.println(request.getParameter("id2"));
+        modelp.setId(request.getParameter("id2"));
         
         if(!request.getParameter("marque").isEmpty()){
             model.setMarque(request.getParameter("marque"));
@@ -448,43 +464,43 @@ public class VehiculeServlet extends HttpServlet {
         }
         
         if(testRegex(request.getParameter("nomProprietaire"), "^[A-Z]+(?:[- ][A-Z]+)*$")){
-            model.setNomProprietaire(request.getParameter("nomProprietaire"));
+            modelp.setNom(request.getParameter("nomProprietaire"));
         }else{
             errors.put("nomProprietaire", "Erreur d'insertion");
         }
         
         if(testRegex(request.getParameter("prenomProprietaire"), "^[A-Z][a-zÀ-ÿ]*(?:[-\\s][A-Z][a-zÀ-ÿ]*)*$")){
-            model.setPrenomProprietaire(request.getParameter("prenomProprietaire"));
+            modelp.setPrenom(request.getParameter("prenomProprietaire"));
         }else{
             errors.put("prenomProprietaire", "Erreur d'insertion");
         }
         
         if(!request.getParameter("sexeProprietaire").isEmpty()){
-            model.setSexeProprietaire(request.getParameter("sexeProprietaire"));
+            modelp.setSexe(request.getParameter("sexeProprietaire"));
         } else {
             errors.put("sexeProprietaire", "Erreur d'insertion");
         }
         
         if(testRegex(request.getParameter("telProprietaire"), "^(3[0-9]|4[0-46-9]|55)\\d{6}$")){
-            model.setTelProprietaire(request.getParameter("telProprietaire"));
+            modelp.setTel(request.getParameter("telProprietaire"));
         }else{
             errors.put("telProprietaire", "Erreur d'insertion");
         }
         
         if(!request.getParameter("adresseProprietaire").isEmpty()){
-            model.setAdresseProprietaire(request.getParameter("adresseProprietaire"));
+            modelp.setAdresse(request.getParameter("adresseProprietaire"));
         } else {
             errors.put("adresseProprietaire", "Erreur d'insertion");
         }
         
         if(!request.getParameter("typePieceProp").isEmpty()){
-            model.setTypePieceProp(request.getParameter("typePieceProp"));
+            modelp.setTypePiece(request.getParameter("typePieceProp"));
         } else {
             errors.put("typePieceProp", "Erreur d'insertion");
         }
         
         if(!request.getParameter("noPiece").isEmpty()){
-            model.setNoPiece(request.getParameter("noPiece"));
+            modelp.setNoPiece(request.getParameter("noPiece"));
         } else {
             errors.put("noPiece", "Erreur d'insertion");
         }
@@ -506,7 +522,7 @@ public class VehiculeServlet extends HttpServlet {
         }
         
         if(testRegex(request.getParameter("courrielProprietaire"), "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")){
-            model.setCourrielProprietaire(request.getParameter("courrielProprietaire"));
+            modelp.setCourriel(request.getParameter("courrielProprietaire"));
         }else{
             errors.put("courrielProprietaire", "Erreur d'insertion");
         }
@@ -524,7 +540,15 @@ public class VehiculeServlet extends HttpServlet {
             request.getRequestDispatcher("/vehicule/Modifier_Vehicule.jsp").forward(request, response);
         }else{
             try {
+                if (pdao.update(modelp) > 0) {
+                    System.out.println("OK!!!");
+                }
+            }catch (ClassNotFoundException ex) {
+                System.out.println("Erreur 2:" + ex.getMessage());
+            }
+            try {
                 if (dao.update(model) > 0) {
+                    
                     System.out.println("OK!!!");
                 }
             }catch (ClassNotFoundException ex) {
@@ -536,7 +560,10 @@ public class VehiculeServlet extends HttpServlet {
     protected void display(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         try {
+            List<Proprietaire> listeP = pdao.getAll();
             List<Vehicule> liste = dao.getAll();
+            
+            request.setAttribute("proprietaires", listeP);
             request.setAttribute("vehicules", liste);
             
             // redirection vers la page afficher

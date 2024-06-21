@@ -20,8 +20,8 @@ public class VehiculeDao implements IDao<Vehicule>{
     Connection connection=null;
     PreparedStatement pst=null;
     ResultSet rs=null;
-    @Override
-    public int save(Vehicule vehicule) throws SQLException, ClassNotFoundException {
+
+    public int saveV(Vehicule vehicule, String id) throws SQLException, ClassNotFoundException {
         //throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
         
         // recuperation de la connection a la database
@@ -29,38 +29,31 @@ public class VehiculeDao implements IDao<Vehicule>{
         
         if(connection != null){
             //creation la chaine de requete
-            String requete="INSERT INTO Vehicule (id, marque, modele, noMoteur, nbCylindre, couleur, typeTransmission, typeEssence, photoVehicule, plaqueImmatriculation, nomProprietaire, prenomProprietaire, sexeProprietaire, telProprietaire, adresseProprietaire, typePieceProp, noPiece, annee, courrielProprietaire, alerte, dateAlerte, dateEnregistrement) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String requete="INSERT INTO Vehicule (id, idProprietaire, marque, modele, noMoteur, nbCylindre, couleur, typeTransmission, typeEssence, photoVehicule, plaqueImmatriculation, annee, alerte, dateAlerte, dateEnregistrement) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             // Utilisation de la methode preparedStatement
             pst=connection.prepareStatement(requete);
 
             // passage des parametres a la requete
             pst.setString(1, vehicule.genererCode());
-            pst.setString(2, vehicule.getMarque());
-            pst.setString(3, vehicule.getModele());
-            pst.setString(4, vehicule.getNoMoteur());
-            pst.setInt(5, vehicule.getNbCylindre());
-            pst.setString(6, vehicule.getCouleur());
-            pst.setString(7, vehicule.getTypeTransmission());
-            pst.setString(8, vehicule.getTypeEssence());
-            pst.setBytes(9, vehicule.getPhotoVehicule());
-            pst.setString(10, vehicule.getPlaqueImmatriculation());
-            pst.setString(11, vehicule.getNomProprietaire());
-            pst.setString(12, vehicule.getPrenomProprietaire());
-            pst.setString(13, vehicule.getSexeProprietaire());
-            pst.setString(14, vehicule.getTelProprietaire());
-            pst.setString(15, vehicule.getAdresseProprietaire());
-            pst.setString(16, vehicule.getTypePieceProp());
-            pst.setString(17, vehicule.getNoPiece());
-            pst.setInt(18, vehicule.getAnnee());
-            pst.setString(19, vehicule.getCourrielProprietaire());
-            pst.setBoolean(20, vehicule.isAlerte());
+            pst.setString(2, id);
+            pst.setString(3, vehicule.getMarque());
+            pst.setString(4, vehicule.getModele());
+            pst.setString(5, vehicule.getNoMoteur());
+            pst.setInt(6, vehicule.getNbCylindre());
+            pst.setString(7, vehicule.getCouleur());
+            pst.setString(8, vehicule.getTypeTransmission());
+            pst.setString(9, vehicule.getTypeEssence());
+            pst.setBytes(10, vehicule.getPhotoVehicule());
+            pst.setString(11, vehicule.getPlaqueImmatriculation());
+            pst.setInt(12, vehicule.getAnnee());
+            pst.setBoolean(13, vehicule.isAlerte());
             if(vehicule.isAlerte()){
-                pst.setDate(21, new Date(System.currentTimeMillis()));
+                pst.setDate(14, new Date(System.currentTimeMillis()));
             }else{
-                pst.setDate(21, null);
+                pst.setDate(14, null);
             }
-            pst.setTimestamp(22, new java.sql.Timestamp(System.currentTimeMillis())); 
+            pst.setTimestamp(15, new java.sql.Timestamp(System.currentTimeMillis())); 
             // execution la requete
             int n = pst.executeUpdate();
 
@@ -68,8 +61,7 @@ public class VehiculeDao implements IDao<Vehicule>{
             ConnectionDB.closeConnection(rs, pst, connection);
 
             return n;
-        }
-                
+        }   
         return 0;
     }
 
@@ -82,7 +74,7 @@ public class VehiculeDao implements IDao<Vehicule>{
         
         if(connection != null){
             //creation la chaine de requete
-            String requete="UPDATE Vehicule SET marque=?, modele=?, noMoteur=?, nbCylindre=?, couleur=?, typeTransmission=?, typeEssence=?, photoVehicule=?, plaqueImmatriculation=?, nomProprietaire=?, prenomProprietaire=?, sexeProprietaire=?, telProprietaire=?, adresseProprietaire=?, typePieceProp=?, noPiece=?, annee=?, courrielProprietaire=?, alerte=?- WHERE id=?";
+            String requete="UPDATE Vehicule SET marque=?, modele=?, noMoteur=?, nbCylindre=?, couleur=?, typeTransmission=?, typeEssence=?, photoVehicule=?, plaqueImmatriculation=?, annee=?, alerte=? WHERE id=?";
 
             // Utilisation de la methode preparedStatement
             pst=connection.prepareStatement(requete);
@@ -98,22 +90,14 @@ public class VehiculeDao implements IDao<Vehicule>{
             pst.setString(7, vehicule.getTypeEssence());
             pst.setBytes(8, vehicule.getPhotoVehicule());
             pst.setString(9, vehicule.getPlaqueImmatriculation());
-            pst.setString(10, vehicule.getNomProprietaire());
-            pst.setString(11, vehicule.getPrenomProprietaire());
-            pst.setString(12, vehicule.getSexeProprietaire());
-            pst.setString(13, vehicule.getTelProprietaire());
-            pst.setString(14, vehicule.getAdresseProprietaire());
-            pst.setString(15, vehicule.getTypePieceProp());
-            pst.setString(16, vehicule.getNoPiece());
-            pst.setInt(17, vehicule.getAnnee());
-            pst.setString(18, vehicule.getCourrielProprietaire());
-            pst.setBoolean(19, vehicule.isAlerte());
+            pst.setInt(10, vehicule.getAnnee());
+            pst.setBoolean(11, vehicule.isAlerte());
             /*if(vehicule.getDateAlerte() != null){
                 pst.setDate(20, java.sql.Date.valueOf(vehicule.getDateAlerte()));
             }else{
                 pst.setDate(20, null);
             } */
-            pst.setString(21, vehicule.getId());
+            pst.setString(12, vehicule.getId());
             // execution la requete
             int n = pst.executeUpdate();
 
@@ -187,13 +171,14 @@ public class VehiculeDao implements IDao<Vehicule>{
         
         if(connection != null){
             //creation la chaine de requete
-            String requete="DELETE FROM Vehicule WHERE id=?";
+            String requete="UPDATE Vehicule SET etat = ? WHERE id=?";
 
             // Utilisation de la methode preparedStatement
             pst=connection.prepareStatement(requete);
 
             // passage de parametres a la requete
-            pst.setString(1, id);
+            pst.setString(1, "0");
+            pst.setString(2, id);
             // execution la requete
             int n = pst.executeUpdate();
 
@@ -213,17 +198,20 @@ public class VehiculeDao implements IDao<Vehicule>{
         // recuperation de la connexion a la BD
         connection=ConnectionDB.getConnection();
         // creer la chaine de requete
-        String requete="SELECT * FROM vehicule";
+        String requete="SELECT * FROM vehicule WHERE etat = ?";
         // appelle a la methode preparedStatement
         pst=connection.prepareStatement(requete);
+        
+        pst.setString(1, "1");
         // executer la requete en stockant le resultat dans un ResultSet
         rs=pst.executeQuery();
-        System.out.println(rs);
+        
         // parcourrir le ResultSet
         Vehicule model=null;
         while(rs.next()){
            model=new Vehicule();  
            model.setId(rs.getString("id"));
+           model.setIdProprietaire(rs.getString("idProprietaire"));
            model.setMarque(rs.getString("marque"));
            model.setCouleur(rs.getString("couleur"));
            model.setModele(rs.getString("modele"));
@@ -233,15 +221,7 @@ public class VehiculeDao implements IDao<Vehicule>{
            model.setTypeEssence(rs.getString("typeEssence"));
            model.setPhotoVehicule(rs.getBytes("photoVehicule"));
            model.setPlaqueImmatriculation(rs.getString("plaqueImmatriculation"));
-           model.setNomProprietaire(rs.getString("nomProprietaire"));
-           model.setPrenomProprietaire(rs.getString("prenomProprietaire"));
-           model.setSexeProprietaire(rs.getString("sexeProprietaire"));
-           model.setTelProprietaire(rs.getString("telProprietaire"));
-           model.setAdresseProprietaire(rs.getString("adresseProprietaire"));
-           model.setTypePieceProp(rs.getString("typePieceProp"));
-           model.setNoPiece(rs.getString("noPiece"));
            model.setAnnee(rs.getInt("annee"));
-           model.setCourrielProprietaire(rs.getString("courrielProprietaire"));
            model.setAlerte(rs.getBoolean("alerte"));
            /*if(rs.getString("alerte").equalsIgnoreCase("1")){
                 model.setAlerte(true);
@@ -283,6 +263,7 @@ public class VehiculeDao implements IDao<Vehicule>{
         rs = pst.executeQuery();
         while(rs.next()){
            model.setId(rs.getString("id"));
+           model.setIdProprietaire(rs.getString("idProprietaire"));
            model.setMarque(rs.getString("marque"));
            model.setCouleur(rs.getString("couleur"));
            model.setModele(rs.getString("modele"));
@@ -292,15 +273,7 @@ public class VehiculeDao implements IDao<Vehicule>{
            model.setTypeEssence(rs.getString("typeEssence"));
            model.setPhotoVehicule(rs.getBytes("photoVehicule"));
            model.setPlaqueImmatriculation(rs.getString("plaqueImmatriculation"));
-           model.setNomProprietaire(rs.getString("nomProprietaire"));
-           model.setPrenomProprietaire(rs.getString("prenomProprietaire"));
-           model.setSexeProprietaire(rs.getString("sexeProprietaire"));
-           model.setTelProprietaire(rs.getString("telProprietaire"));
-           model.setAdresseProprietaire(rs.getString("adresseProprietaire"));
-           model.setTypePieceProp(rs.getString("typePieceProp"));
-           model.setNoPiece(rs.getString("noPiece"));
            model.setAnnee(rs.getInt("annee"));
-           model.setCourrielProprietaire(rs.getString("courrielProprietaire"));
            model.setAlerte(rs.getBoolean("alerte"));
            /*if(rs.getString("alerte").equalsIgnoreCase("1")){
                 model.setAlerte(true);
@@ -316,6 +289,11 @@ public class VehiculeDao implements IDao<Vehicule>{
             model.setDateEnregistrement(java.sql.Timestamp.valueOf(rs.getString("dateEnregistrement")));
         }
         return model;
+    }
+
+    @Override
+    public int save(Vehicule obj) throws SQLException, ClassNotFoundException {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
     
 }

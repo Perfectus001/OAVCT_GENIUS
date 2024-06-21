@@ -6,7 +6,8 @@
             <file>file:/C:/Users/Perfectus/Documents/NetBeansProjects/OAVCT_PROJECT/src/java/servlets/VehiculeServlet.java</file>
             <file>file:/C:/Users/Perfectus/Documents/NetBeansProjects/OAVCT_PROJECT/web/index.html</file>
             <file>file:/C:/Users/Perfectus/Documents/NetBeansProjects/OAVCT_PROJECT/src/java/dao/IDao.java</file>
-            <file>file:/C:/Users/Perfectus/Documents/NetBeansProjects/OAVCT_PROJECT/web/WEB-INF/web.xml</file>
+            <file>file:/C:/Users/Perfectus/Documents/NetBeansProjects/OAVCT_PROJECT/src/java/dao/ProprietaireDao.java</file>
+            <file>file:/C:/Users/Perfectus/Documents/NetBeansProjects/OAVCT_PROJECT/src/java/model/Proprietaire.java</file>
             <file>file:/C:/Users/Perfectus/Documents/NetBeansProjects/OAVCT_PROJECT/web/vehicule/Afficher_Vehicule.jsp</file>
             <file>file:/C:/Users/Perfectus/Documents/NetBeansProjects/OAVCT_PROJECT/web/vehicule/Recherche_Vehicule.jsp</file>
             <file>file:/C:/Users/Perfectus/Documents/NetBeansProjects/OAVCT_PROJECT/web/vehicule/Modifier_Vehicule.jsp</file>

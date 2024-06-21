@@ -18,7 +18,7 @@ public class ConnectionDB {
        Class.forName("com.mysql.cj.jdbc.Driver");
        // etablir la connection a la BD
        // url
-       String url="jdbc:mysql://localhost:3306/oavct_db";
+       String url="jdbc:mysql://localhost:3306/oavct_db2";
        con=DriverManager.getConnection(url,"root","");
        return con;
    }

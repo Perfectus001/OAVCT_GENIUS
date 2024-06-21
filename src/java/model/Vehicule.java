@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class Vehicule {
     private String id;
+    private String idProprietaire;
     private String marque;
     private String couleur;
     private String modele;
@@ -44,6 +45,14 @@ public class Vehicule {
 
     public void setId(String id) {
         this.id = id;
+    }
+    
+    public String getIdProprietaire() {
+        return idProprietaire;
+    }
+
+    public void setIdProprietaire(String idProprietaire) {
+        this.idProprietaire = idProprietaire;
     }
 
     public String getMarque() {

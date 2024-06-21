@@ -7,6 +7,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.util.List" %>
 <%@page import="model.Vehicule" %>
+<%@page import="model.Proprietaire" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -18,7 +19,8 @@
         <hr>
 
                 <%List<Vehicule> list = (List<Vehicule>)request.getAttribute("vehicules");
-                if(list != null && !list.isEmpty()){%>
+                List<Proprietaire> listP = (List<Proprietaire>)request.getAttribute("proprietaires");
+                if(list != null && listP !=null && !list.isEmpty() && !listP.isEmpty()){%>
         <table>
             <thead>
                 <tr>
@@ -38,22 +40,24 @@
             </thead>
             <tbody>    
                 <%
-                for(Vehicule v:list){%>
+                for(Vehicule v:list){
+                    for(Proprietaire p:listP){
+                        if(v.getIdProprietaire().equalsIgnoreCase(p.getId())){%>
                 <tr>
                     <td><%= v.getId() %></td>
                     <td><%= v.getMarque() %></td>
                     <td><%= v.getModele() %></td>
                     <td><%= v.getCouleur() %></td>
                     <td><%= v.getPlaqueImmatriculation() %></td>
-                    <td><%= v.getNomProprietaire() %></td>
-                    <td><%= v.getPrenomProprietaire() %></td>
-                    <td><%= v.getSexeProprietaire() %></td>
-                    <td><%= v.getTelProprietaire() %></td>
-                    <td><%= v.getCourrielProprietaire() %></td>
+                    <td><%= p.getNom() %></td>
+                    <td><%= p.getPrenom() %></td>
+                    <td><%= p.getSexe() %></td>
+                    <td><%= p.getTel() %></td>
+                    <td><%= p.getCourriel() %></td>
                     <td><%= v.isAlerte() %></td>
                     <td><a href="${pageContext.request.contextPath}/VehiculeServlet?id=<%=v.getId()+ "&opt=search"%>"> plus</a></td>
                 </tr>
-    <%}}else{%>
+                <%}}}}else{%>
                     <p>Aucune donnee a ete trouve</p>
                 <%}%>
             </tbody>
