@@ -14,6 +14,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import model.Proprietaire;
+import java.sql.SQLIntegrityConstraintViolationException;
+
 
 /**
  *
@@ -26,31 +28,36 @@ public class ProprietaireDao implements IDao<Proprietaire> {
 
  
     public String saveP(Proprietaire proprietaire) throws SQLException, ClassNotFoundException {
+        int n = 0;
         // recuperation de la connection a la database
         connection = ConnectionDB.getConnection();
         String id = proprietaire.genererCode();
         if(connection != null){
-            //creation la chaine de requete
-            String requete="INSERT INTO proprietaire (id, nom, prenom, sexe, telephone, adresse, typePiece, noPiece, courriel) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            try{
+                //creation la chaine de requete
+                String requete="INSERT INTO proprietaire (id, nom, prenom, sexe, telephone, adresse, typePiece, noPiece, courriel) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                System.out.println("------------------");
+                // Utilisation de la methode preparedStatement
+                pst=connection.prepareStatement(requete);
 
-            // Utilisation de la methode preparedStatement
-            pst=connection.prepareStatement(requete);
+                // passage des parametres a la requete
+                pst.setString(1, id);
+                pst.setString(2, proprietaire.getNom());
+                pst.setString(3, proprietaire.getPrenom());
+                pst.setString(4, proprietaire.getSexe());
+                pst.setString(5, proprietaire.getTel());
+                pst.setString(6, proprietaire.getAdresse());
+                pst.setString(7, proprietaire.getTypePiece());
+                pst.setString(8, proprietaire.getNoPiece());
+                pst.setString(9, proprietaire.getCourriel());
+                // execution la requete
+                n = pst.executeUpdate();
 
-            // passage des parametres a la requete
-            pst.setString(1, id);
-            pst.setString(2, proprietaire.getNom());
-            pst.setString(3, proprietaire.getPrenom());
-            pst.setString(4, proprietaire.getSexe());
-            pst.setString(5, proprietaire.getTel());
-            pst.setString(6, proprietaire.getAdresse());
-            pst.setString(7, proprietaire.getTypePiece());
-            pst.setString(8, proprietaire.getNoPiece());
-            pst.setString(9, proprietaire.getCourriel());
-            // execution la requete
-            int n = pst.executeUpdate();
-
-            // fermer les connections
-            ConnectionDB.closeConnection(rs, pst, connection);
+                // fermer les connections
+                ConnectionDB.closeConnection(rs, pst, connection);
+            }catch(SQLIntegrityConstraintViolationException e){
+                System.out.println("erreur -> "+e.getMessage());
+            }
             if(n > 0){
                 return id;
             }

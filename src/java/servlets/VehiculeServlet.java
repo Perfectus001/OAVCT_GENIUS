@@ -202,7 +202,7 @@ public class VehiculeServlet extends HttpServlet {
                 {
                     try {
                         save(request,response);
-                        //display(request,response);
+                        display(request,response);
                     } catch (SQLException ex) {
                         Logger.getLogger(VehiculeServlet.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -243,7 +243,6 @@ public class VehiculeServlet extends HttpServlet {
         } else {
             errors.put("marque", "Erreur d'insertion");
         }
-        System.out.println(model.getMarque());
         if(!request.getParameter("modele").isEmpty()){
             model.setModele(request.getParameter("modele"));
         } else {
@@ -396,7 +395,6 @@ public class VehiculeServlet extends HttpServlet {
         Map<String, String> errors = new HashMap<>();
         
         model.setId(request.getParameter("id"));
-        System.out.println(request.getParameter("id2"));
         modelp.setId(request.getParameter("id2"));
         
         if(!request.getParameter("marque").isEmpty()){
@@ -404,7 +402,6 @@ public class VehiculeServlet extends HttpServlet {
         } else {
             errors.put("marque", "Erreur d'insertion");
         }
-        System.out.println(model.getMarque());
         if(!request.getParameter("modele").isEmpty()){
             model.setModele(request.getParameter("modele"));
         } else {
