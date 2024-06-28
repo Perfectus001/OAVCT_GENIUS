@@ -16,6 +16,10 @@
         <servlet-name>TransfertServlet</servlet-name>
         <servlet-class>servlets.TransfertServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>essai</servlet-name>
+        <servlet-class>servlets.essai</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>VehiculeServlet</servlet-name>
         <url-pattern>/VehiculeServlet</url-pattern>
@@ -31,6 +35,10 @@
     <servlet-mapping>
         <servlet-name>TransfertServlet</servlet-name>
         <url-pattern>/TransfertServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>essai</servlet-name>
+        <url-pattern>/essai</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
         <welcome-file>login.jsp</welcome-file>

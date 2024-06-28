@@ -115,4 +115,21 @@ public class Proprietaire {
                 r.nextInt(9999);
         return code.toUpperCase();
     }
+    
+    public static String prenom(String phrase) {
+        String[] mots = phrase.split("\\s+");
+        StringBuilder result = new StringBuilder();
+
+        for (String mot : mots) {
+            if (!mot.isEmpty()) {
+                String premiereLettre = mot.substring(0, 1).toUpperCase();
+                String resteMot = mot.substring(1).toLowerCase();
+                result.append(premiereLettre).append(resteMot).append(" ");
+            } else {
+                result.append(" ");
+            }
+        }
+
+        return result.toString().trim();
+    }
 }

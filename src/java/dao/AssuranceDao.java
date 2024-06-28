@@ -25,16 +25,18 @@ public class AssuranceDao implements IDao<Assurance> {
     
     @Override
     public int save(Assurance assurance) throws SQLException, ClassNotFoundException {
+
         // recuperation de la connection a la database
         connection = ConnectionDB.getConnection();
         if(connection != null){
+            String id = assurance.genererCode();
             //creation la chaine de requete
             String requete="INSERT INTO Assurance (id, idVehicule, montantAssurance, datePaiement, dateFinAssurance) VALUES (?, ?, ?, ?, ?)";
 
             // Utilisation de la methode preparedStatement
             pst=connection.prepareStatement(requete);
             // passage des parametres a la requete
-            pst.setString(1, assurance.genererCode());
+            pst.setString(1, id);
             pst.setString(2, assurance.getIdVehicule());
             pst.setDouble(3, assurance.getMontantAssurance());
             pst.setDate(4, assurance.getDatePaiement());
@@ -95,10 +97,37 @@ public class AssuranceDao implements IDao<Assurance> {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
     
-    public boolean betweenDate(Assurance assurance){
+    public boolean betweenDate(String idV, java.sql.Date sqlDate) throws SQLException, ClassNotFoundException{
+        // Connection a la base de donnee
+        connection = ConnectionDB.getConnection();
         
+        //Requete
+        String req = "SELECT * FROM Assurance WHERE idVehicule = ? ORDER BY dateFinAssurance DESC LIMIT 1";
         
-        return false;
+        //Passage de la requete a la methode preparedStatement
+        pst = connection.prepareStatement(req);
+        //Passage du parametre a la methode
+        pst.setString(1, idV);
+        
+        Assurance model = null;//Creation d'une instance d'assurance
+
+        //execution de la requete
+        rs = pst.executeQuery();
+        while(rs.next()){
+           model = new Assurance();
+           model.setId(rs.getString("id"));
+           model.setIdVehicule(rs.getString("idVehicule"));
+           model.setMontantAssurance(Double.parseDouble(rs.getString("montantAssurance")));
+           model.setDatePaiement(rs.getDate("datePaiement"));
+           model.setDateFinAssurance(rs.getDate("dateFinAssurance"));
+        }
+        
+        ConnectionDB.closeConnection(rs, pst, connection);
+        
+        if(model != null){
+            return sqlDate.after(model.getDateFinAssurance());
+        }
+        return true;
     }
     
 }

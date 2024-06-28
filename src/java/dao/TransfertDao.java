@@ -39,8 +39,9 @@ public class TransfertDao implements IDao<Transfert> {
                 pst.setString(2, transfert.getIdExProprietaire());
                 pst.setString(3, id);
                 pst.setString(4, transfert.getMotifTransfert());
-                if(!transfert.getEtat().equalsIgnoreCase("A")){
-                    Date currentDate = new Date();
+                if(transfert.getEtat().equalsIgnoreCase("A")){
+                    
+                    Date currentDate = new java.util.Date();
                     // Convertir en java.sql.Date
                    Date sqlDate = new Date(currentDate.getTime());  
                    pst.setDate(5, new java.sql.Date(sqlDate.getTime()) );

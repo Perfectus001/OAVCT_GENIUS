@@ -12,60 +12,98 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <%@include file="../layout/headInfo.jsp" %>
         <title>JSP Page</title>
+        <style>
+            .list-unstyled {
+                list-style: none;
+                padding-left: 0;
+            }
+            .label {
+                font-weight: bold;
+            }
+            .info {
+                margin-bottom: 15px;
+            }
+            .img-thumbnail {
+                max-width: 100px;
+                height: auto;
+            }
+        </style>
     </head>
     <body>
-        <%
-            Vehicule v = (Vehicule)request.getAttribute("vehicules");
-            Proprietaire p = (Proprietaire)request.getAttribute("proprietaires");
-        if(v != null && p != null){
-        %>
-        <h3><%=v.getId()%></h3>
-        <hr>
-        <div>
-            <div></div>
-            <div>
-                <ul>
-                    <li><strong>MARQUE: </strong><%=v.getMarque()%></li>
-                    <li><strong>COULEUR: </strong><%=v.getCouleur()%></li>
-                    <li><strong>MODELE: </strong><%=v.getModele()%></li>
-                    <li><strong>ANNEE: </strong><%=v.getAnnee()%></li>
-                    <li><strong>NO. MOTEUR: </strong><%=v.getNoMoteur()%></li>
-                    <li><strong>NBRE CYLINDRE: </strong><%=v.getNbCylindre()%></li>
-                    <li><strong>TYPE TRANSMISSION: </strong><%=v.getTypeTransmission()%></li>
-                    <li><strong>TYPE ESSENCE: </strong><%=v.getTypeEssence()%></li>
-                    <li><strong>PLAQUE D'IMMATRICULATION: </strong><%=v.getPlaqueImmatriculation()%></li>
-                    <li><strong>NOM PROPRIETAIRE: </strong><%=p.getNom()%></li>
-                    <li><strong>PRENOM PROPRIETAIRE: </strong><%=p.getPrenom()%></li>
-                    <li><strong>SEXE PROPRIETAIRE: </strong><%=p.getSexe()%></li>
-                    <li><strong>TEL PROPRIETAIRE: </strong><%=p.getTel()%></li>
-                    <li><strong>ADRESSE PROPRIETAIRE: </strong><%=p.getAdresse()%></li>
-                    <li><strong>TYPE PIECE PROPRIETAIRE: </strong><%=p.getTypePiece()%></li>
-                    <li><strong>NO PIECE: </strong><%=p.getNoPiece()%></li>
-                    <li><strong>COURRIEL PROPRIETAIRE: </strong><%=p.getCourriel()%></li>
-                    <li><strong>ALERTE: </strong><%=v.isAlerte()%></li>
-                    <li><strong>DATE ALERTE: </strong><%=v.getDateAlerte()%></li>
-                    <li><strong>DATE ENREGISTREMENT: </strong><%=v.getDateEnregistrement().toLocalDateTime().toLocalDate()%></li>
-                    <button><a href="${pageContext.request.contextPath}/VehiculeServlet?id=<%=v.getId()+ "&opt=mod" + "&id2="+ p.getId()%>"> Modifier</a></button>
-                    <%if(v.isAlerte()){
-                    %>
-                    <button><a href="${pageContext.request.contextPath}/VehiculeServlet?id=<%=v.getId()+ "&opt=dalt"%>"> Desactiver Alerte</a></button>
-                    <%}else{%>
-                    <button><a href="${pageContext.request.contextPath}/VehiculeServlet?id=<%=v.getId()+ "&opt=alt"%>"> Activer Alerte </a></button>
-                    <%}%>
-                    
-                    <%
-                    User us = null;
-                    if(session.getAttribute("models")!=null){
-                    us = (User)session.getAttribute("models");
-                    if(us.toString().equalsIgnoreCase("admin")){
-                    if(v.calculeDifferenceHeure() < 14400){%>
-                    <button><a href="${pageContext.request.contextPath}/VehiculeServlet?id=<%=v.getId()+ "&opt=sup"%>"> Supprimer</a></button>
-                    <%}}}%>
-                </ul>
+        <div class="container-scroller">
+            <%@include file="../layout/navbar.jsp" %>
+            <div class="container-fluid page-body-wrapper">
+                <%@include file="../layout/sidebar.jsp" %>
+                <%
+                    Vehicule v = (Vehicule)request.getAttribute("vehicules");
+                    Proprietaire p = (Proprietaire)request.getAttribute("proprietaires");
+                if(v != null && p != null){
+                %>
+                <div class="main-panel">
+                    <div class="content-wrapper">
+                        <div class="page-header">
+                            <h3 class="page-title">Enregistrer vehicule</h3>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 grid-margin">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h3><%=v.getId()%></h3>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <img src="path_to_image.jpg" alt="Logo" class="img-thumbnail rounded-circle">
+                                                <div class="info"><span class="label">MARQUE:</span> <%=v.getMarque()%></div>
+                                                <div class="info"><span class="label">COULEUR:</span> <%=v.getCouleur()%></div>
+                                                <div class="info"><span class="label">MODELE:</span> <%=v.getModele()%></div>
+                                                <div class="info"><span class="label">ANNEE:</span> <%=v.getAnnee()%></div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="info"><span class="label">NO. MOTEUR:</span> <%=v.getNoMoteur()%></div>
+                                                <div class="info"><span class="label">NBRE CYLINDRE:</span> <%=v.getNbCylindre()%></div>
+                                                <div class="info"><span class="label">TYPE TRANSMISSION:</span> <%=v.getTypeTransmission()%></div>
+                                                <div class="info"><span class="label">TYPE ESSENCE:</span> <%=v.getTypeEssence()%></div>
+                                                <div class="info"><span class="label">PLAQUE D'IMMATRICULATION:</span> <%=v.getPlaqueImmatriculation()%></div>
+                                                <div class="info"><span class="label">ALERTE:</span> <%=v.isAlerte()%></div>
+                                                <div class="info"><span class="label">DATE ALERTE:</span> <%=v.getDateAlerte()%></div>
+                                                <div class="info"><span class="label">DATE ENREGISTREMENT:</span> <%=v.getDateEnregistrement().toLocalDateTime().toLocalDate()%></div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="info"><span class="label">NOM PROPRIETAIRE:</span> <%=p.getNom()%></div>
+                                                <div class="info"><span class="label">PRENOM PROPRIETAIRE:</span> <%=p.getPrenom()%></div>
+                                                <div class="info"><span class="label">SEXE PROPRIETAIRE:</span> <%=p.getSexe()%></div>
+                                                <div class="info"><span class="label">TEL PROPRIETAIRE:</span> <%=p.getTel()%></div>
+                                                <div class="info"><span class="label">ADRESSE PROPRIETAIRE:</span> <%=p.getAdresse()%></div>
+                                                <div class="info"><span class="label">TYPE PIECE PROPRIETAIRE:</span> <%=p.getTypePiece()%></div>
+                                                <div class="info"><span class="label">NO PIECE:</span> <%=p.getNoPiece()%></div>
+                                                <div class="info"><span class="label">COURRIEL PROPRIETAIRE:</span> <%=p.getCourriel()%></div>
+                                            </div>
+                                        </div>
+                                        <div class="text-center mt-4">
+                                            <a href="${pageContext.request.contextPath}/VehiculeServlet?id=<%=v.getId()+ "&opt=mod" + "&id2="+ p.getId()%>" class="text-blue"><i class="mdi mdi-pencil"></i> Modifier</a>
+                                            <% if (v.isAlerte()) { %>
+                                            <a href="${pageContext.request.contextPath}/VehiculeServlet?id=<%=v.getId()+ "&opt=dalt"%>" class="text-blue ml-3 mr-3"><i class="mdi mdi-bell-off" style="color:red;"></i> Alerte</a>
+                                            <% } else { %>
+                                            <a href="${pageContext.request.contextPath}/VehiculeServlet?id=<%=v.getId()+ "&opt=alt"%>" class="text-blue ml-3 mr-3"><i class="mdi mdi-bell-ring" style="color:red;"></i> Alerte</a>
+                                            <% } %>
+                                            <%
+                                                us = (User)session.getAttribute("models");
+                                                if (us != null && us.getFonction().equalsIgnoreCase("admin") && v.calculeDifferenceHeure() < 14400 && !v.isAlerte()) {
+                                            %>
+                                            <a href="${pageContext.request.contextPath}/VehiculeServlet?id=<%=v.getId()+ "&opt=sup"%>" class="text-blue"><i class="mdi mdi-delete" style="color:black;"></i> Supprimer</a>
+                                            <% } %>
+                                        </div>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <%}%>
+        <%@include file="../layout/footer.jsp" %>
     </body>
 </html>

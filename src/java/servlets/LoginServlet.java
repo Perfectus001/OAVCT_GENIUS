@@ -40,7 +40,7 @@ public class LoginServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet LoginServlet</title>");            
+            out.println("<title>Servlet LoginServlet</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet LoginServlet at " + request.getContextPath() + "</h1>");
@@ -61,7 +61,13 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        // recuration de la session 
+        HttpSession session = request.getSession();
+        if (session != null) {
+            session.invalidate();
+            response.sendRedirect("login.jsp");
+        }
+
     }
 
     /**
@@ -78,11 +84,13 @@ public class LoginServlet extends HttpServlet {
         UserDao dao = new UserDao();
         try {
             User model = dao.getUser(request.getParameter("username"), request.getParameter("pwd"));
-            if(model!=null){
+            if (model != null) {
                 HttpSession session = request.getSession();
-                 // mettre les infos du user dans une session
+                // mettre les infos du user dans une session
                 session.setAttribute("models", model);
                 response.sendRedirect(request.getContextPath() + "/VehiculeServlet");
+            }else{
+                response.sendRedirect("login.jsp");
             }
         } catch (SQLException ex) {
             Logger.getLogger(LoginServlet.class.getName()).log(Level.SEVERE, null, ex);

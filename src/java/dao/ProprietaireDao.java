@@ -27,7 +27,7 @@ public class ProprietaireDao implements IDao<Proprietaire> {
     ResultSet rs=null;
 
  
-    public String saveP(Proprietaire proprietaire) throws SQLException, ClassNotFoundException {
+    public String saveP(Proprietaire proprietaire) throws SQLException, ClassNotFoundException, SQLIntegrityConstraintViolationException {
         int n = 0;
         // recuperation de la connection a la database
         connection = ConnectionDB.getConnection();
@@ -100,7 +100,20 @@ public class ProprietaireDao implements IDao<Proprietaire> {
 
     @Override
     public int delete(String id) throws SQLException, ClassNotFoundException {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        // Connection a la base de donnee
+        connection = ConnectionDB.getConnection();
+        
+        //Requete
+        String req = "DELETE FROM Proprietaire WHERE id = ?";
+        
+        //Passage de la requete a la methode preparedStatement
+        pst = connection.prepareStatement(req);
+        //Passage du parametre a la methode
+        pst.setString(1, id);
+        
+        int n = pst.executeUpdate();
+        
+        return n;
     }
 
     @Override
@@ -168,6 +181,77 @@ public class ProprietaireDao implements IDao<Proprietaire> {
         }
         return model;
     }
+    
+    public String getExist(String typePiece, String numPiece)throws SQLException, ClassNotFoundException {
+        // Connection a la base de donnee
+        connection = ConnectionDB.getConnection();
+        
+        //Requete
+        String req = "SELECT * FROM proprietaire WHERE typePiece = ? AND noPiece = ?";
+        
+        //Passage de la requete a la methode preparedStatement
+        pst = connection.prepareStatement(req);
+        //Passage du parametre a la methode
+        pst.setString(1, typePiece);
+        pst.setString(2, numPiece);
+        
+        Proprietaire model = null;//Creation d'une instance de vehicule
+
+        //execution de la requete
+        rs = pst.executeQuery();
+        while(rs.next()){
+            model = new Proprietaire();
+           model.setId(rs.getString("id"));
+           model.setNom(rs.getString("nom"));
+           model.setPrenom(rs.getString("prenom"));
+           model.setSexe(rs.getString("sexe"));
+           model.setTel(rs.getString("telephone"));
+           model.setAdresse(rs.getString("adresse"));
+           model.setTypePiece(rs.getString("typePiece"));
+           model.setNoPiece(rs.getString("noPiece"));
+           model.setCourriel(rs.getString("courriel"));
+        }
+        if(model != null){
+           return model.getId(); 
+        }
+        return null;
+    }
+    public String getExist(String typePiece, String numPiece, String id)throws SQLException, ClassNotFoundException {
+        // Connection a la base de donnee
+        connection = ConnectionDB.getConnection();
+        
+        //Requete
+        String req = "SELECT * FROM proprietaire WHERE typePiece = ? AND noPiece = ? AND id = ?";
+        
+        //Passage de la requete a la methode preparedStatement
+        pst = connection.prepareStatement(req);
+        //Passage du parametre a la methode
+        pst.setString(1, typePiece);
+        pst.setString(2, numPiece);
+        pst.setString(3, id);
+        
+        Proprietaire model = null;//Creation d'une instance de vehicule
+
+        //execution de la requete
+        rs = pst.executeQuery();
+        while(rs.next()){
+            model = new Proprietaire();
+           model.setId(rs.getString("id"));
+           model.setNom(rs.getString("nom"));
+           model.setPrenom(rs.getString("prenom"));
+           model.setSexe(rs.getString("sexe"));
+           model.setTel(rs.getString("telephone"));
+           model.setAdresse(rs.getString("adresse"));
+           model.setTypePiece(rs.getString("typePiece"));
+           model.setNoPiece(rs.getString("noPiece"));
+           model.setCourriel(rs.getString("courriel"));
+        }
+        if(model != null){
+           return model.getId(); 
+        }
+        return null;
+    }
+
 
     @Override
     public int save(Proprietaire obj) throws SQLException, ClassNotFoundException {

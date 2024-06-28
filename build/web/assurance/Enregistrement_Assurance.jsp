@@ -9,66 +9,77 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <%@include file="../layout/headInfo.jsp" %>
         <title>JSP Page</title>
     </head>
     <body>
-        <%
-            String id = (String) request.getAttribute("IDVehicule");
-            String error = (String) request.getAttribute("error");
-            Map<String, String> errors = (Map<String, String>) request.getAttribute("errors");
-            if(id == null){
-        %>
-       
-        <form action="${pageContext.request.contextPath}/AssuranceServlet" method="post">
-           <p>
-                <label for="id1">ID du vehicule</label>
-                <input type="text" name="id1">
-                <% if (error != null) { %>
-                    <br><span style="color: red;"><%= error %></span>
-                <% } %>
-            </p>
-            <p>
-                <input type="submit" name="opt" value="Recherche">
-            </p>
-        </form>
-        
-        <% 
-        }else{    
-        
-        %>
+        <div class="container-scroller">
+            <%@include file="../layout/navbar.jsp" %>
+            <div class="container-fluid page-body-wrapper">
+                <%@include file="../layout/sidebar.jsp" %>
+                <div class="main-panel">
+                    <div class="content-wrapper">
+                        <div class="page-header">
+                            <h3 class="page-title"> Enregistrement Assurance </h3>
+                        </div>
+                        <div class="row">
+                            <div class="mx-auto col-12 grid-margin stretch-card">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <%
+                                            String id2 = (String) request.getAttribute("idV2");
+                                            String id = (String) request.getAttribute("IDVehicule");
+                                            String error = (String) request.getAttribute("error");
+                                            Map<String, String> errors = (Map<String, String>) request.getAttribute("errors");
+                                            if(id == null && errors == null){                                            
+                                        %>
 
-        <form action="${pageContext.request.contextPath}/AssuranceServlet" method="post">
-            <h3><%=id!=null?id:""%></h3>
-            
-            <input type="hidden" name="idVehicule" value="<%=id!=null?id:""%>">
+                                        <form class="forms-sample" action="${pageContext.request.contextPath}/AssuranceServlet" method="post">
+                                            <div class="form-group">
+                                                <label for="id1">ID du vehicule</label>
+                                                <input class="form-control" type="text" name="id1">
+                                                <% if (error != null) { %>
+                                                <br><span style="color: red;"><%= error %></span>
+                                                <% } %>
+                                            </div>
+                                            <p>
+                                                <input class="btn btn-primary mr-2" type="submit" name="opt" value="Recherche">
+                                            </p>
+                                        </form>
 
-            
-            <p>
-                <label for="montantAssurance">Montant Assurance</label>
-                <input type="text" name="montantAssurance">
-                <% if (errors != null && errors.containsKey("montantAssurance")) { %>
-                    <br><span style="color: red;"><%= errors.get("montantAssurance") %></span>
-                <% } %>                
-            </p>
-            <p>
-                <label for="datePaiement">Date Paiement</label>
-                <input type="date" name="datePaiement">
-                <% if (errors != null && errors.containsKey("datePaiement")) { %>
-                    <br><span style="color: red;"><%= errors.get("datePaiement") %></span>
-                <% } %>                
-            </p>
-            <p>
-                <label for="dateFinAssurance">Date Fin Assurance</label>
-                <input type="date" name="dateFinAssurance">
-                <% if (errors != null && errors.containsKey("dateFinAssurance")) { %>
-                    <br><span style="color: red;"><%= errors.get("dateFinAssurance") %></span>
-                <% } %>
-            </p>
-            <p>
-                <input type="submit" name="opt" value="Enregistrer">
-            </p>
-        </form>
-            <%}%>
+                                        <% 
+                                        }else{    
+                                            if(id2 != null){
+                                                id = id2;   
+                                            }
+                                        %>
+
+                                        <form action="${pageContext.request.contextPath}/AssuranceServlet" method="post">
+                                            <h3><%=id!=null?id:""%></h3>
+
+                                            <input type="hidden" name="idVehicule" value="<%=id!=null?id:""%>">
+
+
+                                            <div class="form-group">
+                                                <label for="montantAssurance">Montant Assurance</label>
+                                                <input class="form-control" type="text" name="montantAssurance">
+                                                <% if (errors != null && errors.containsKey("montantAssurance")) { %>
+                                                <br><span style="color: red;"><%= errors.get("montantAssurance") %></span>
+                                                <% } %>                
+                                            </div>
+                                            <p>
+                                                <input class="btn btn-primary mr-2" type="submit" name="opt" value="Enregistrer">
+                                            </p>
+                                        </form>
+                                        <%}%>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <%@include file="../layout/footer.jsp" %>
     </body>
 </html>

@@ -21,7 +21,7 @@ public class VehiculeDao implements IDao<Vehicule>{
     PreparedStatement pst=null;
     ResultSet rs=null;
 
-    public int saveV(Vehicule vehicule, String id) throws SQLException, ClassNotFoundException {
+    public int saveV(Vehicule vehicule, String id) throws SQLException, ClassNotFoundException, SQLIntegrityConstraintViolationException {
         //throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
         
         // recuperation de la connection a la database
@@ -110,6 +110,36 @@ public class VehiculeDao implements IDao<Vehicule>{
         return 0;
     }
     
+    
+    public int updateVT(Vehicule vehicule) throws SQLException, ClassNotFoundException {
+        //throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        //
+        // recuperation de la connection a la database
+        connection = ConnectionDB.getConnection();
+        
+        if(connection != null){
+            //creation la chaine de requete
+            String requete="UPDATE Vehicule idProprietaire=? WHERE id=?";
+
+            // Utilisation de la methode preparedStatement
+            pst=connection.prepareStatement(requete);
+
+            // passage des parametres a la requete
+
+            pst.setString(1, vehicule.getIdProprietaire());
+            pst.setString(2, vehicule.getId());
+            // execution la requete
+            int n = pst.executeUpdate();
+
+            // fermer les connections
+            ConnectionDB.closeConnection(rs, pst, connection);
+
+            return n;
+        }
+                
+        return 0;
+    }
+    
     public int desactiverAlerte(Vehicule vehicule) throws SQLException, ClassNotFoundException {
         // recuperation de la connection a la database
         connection = ConnectionDB.getConnection();
@@ -136,6 +166,7 @@ public class VehiculeDao implements IDao<Vehicule>{
         }
         return 0;
     }
+    
     
     public int activerAlerte(Vehicule vehicule) throws SQLException, ClassNotFoundException {
         // recuperation de la connection a la database
@@ -171,14 +202,13 @@ public class VehiculeDao implements IDao<Vehicule>{
         
         if(connection != null){
             //creation la chaine de requete
-            String requete="UPDATE Vehicule SET etat = ? WHERE id=?";
+            String requete="DELETE FROM Vehicule WHERE id=?";
 
             // Utilisation de la methode preparedStatement
             pst=connection.prepareStatement(requete);
 
             // passage de parametres a la requete
-            pst.setString(1, "0");
-            pst.setString(2, id);
+            pst.setString(1, id);
             // execution la requete
             int n = pst.executeUpdate();
 
@@ -198,11 +228,10 @@ public class VehiculeDao implements IDao<Vehicule>{
         // recuperation de la connexion a la BD
         connection=ConnectionDB.getConnection();
         // creer la chaine de requete
-        String requete="SELECT * FROM vehicule WHERE etat = ?";
+        String requete="SELECT * FROM vehicule";
         // appelle a la methode preparedStatement
         pst=connection.prepareStatement(requete);
         
-        pst.setString(1, "1");
         // executer la requete en stockant le resultat dans un ResultSet
         rs=pst.executeQuery();
         
@@ -289,6 +318,54 @@ public class VehiculeDao implements IDao<Vehicule>{
             model.setDateEnregistrement(java.sql.Timestamp.valueOf(rs.getString("dateEnregistrement")));
         }
         return model;
+    }
+    
+    public boolean getProprietaire(String id) throws SQLException, ClassNotFoundException {
+        //throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        // Connection a la base de donnee
+        connection = ConnectionDB.getConnection();
+        
+        //Requete
+        String req = "SELECT * FROM vehicule WHERE id = ?";
+        
+        //Passage de la requete a la methode preparedStatement
+        pst = connection.prepareStatement(req);
+        //Passage du parametre a la methode
+        pst.setString(1, id);
+        
+        Vehicule model = null;
+
+        //execution de la requete
+        rs = pst.executeQuery();
+        while(rs.next()){
+           model = new Vehicule();
+           model.setId(rs.getString("id"));
+           model.setIdProprietaire(rs.getString("idProprietaire"));
+           model.setMarque(rs.getString("marque"));
+           model.setCouleur(rs.getString("couleur"));
+           model.setModele(rs.getString("modele"));
+           model.setNoMoteur(rs.getString("noMoteur"));
+           model.setNbCylindre(rs.getInt("nbCylindre"));
+           model.setTypeTransmission(rs.getString("typeTransmission"));
+           model.setTypeEssence(rs.getString("typeEssence"));
+           model.setPhotoVehicule(rs.getBytes("photoVehicule"));
+           model.setPlaqueImmatriculation(rs.getString("plaqueImmatriculation"));
+           model.setAnnee(rs.getInt("annee"));
+           model.setAlerte(rs.getBoolean("alerte"));
+           /*if(rs.getString("alerte").equalsIgnoreCase("1")){
+                model.setAlerte(true);
+            }else{
+                model.setAlerte(true);
+            }*/
+            if(rs.getDate("dateAlerte") != null){
+                LocalDate dateAlerte = LocalDate.parse(rs.getString("dateAlerte"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                model.setDateAlerte(dateAlerte);
+            }else{
+                model.setDateAlerte(null);
+            }
+            model.setDateEnregistrement(java.sql.Timestamp.valueOf(rs.getString("dateEnregistrement")));
+        }
+        return model == null;
     }
 
     @Override

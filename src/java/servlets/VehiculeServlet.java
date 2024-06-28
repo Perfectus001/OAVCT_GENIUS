@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -33,14 +34,13 @@ import model.Proprietaire;
  *
  * @author Perfectus
  */
-
 /**
  * Servlet pour gérer les téléchargements de fichiers
  */
 @MultipartConfig(
-    fileSizeThreshold = 1024 * 1024 * 2, // 2MB
-    maxFileSize = 1024 * 1024 * 10,      // 10MB
-    maxRequestSize = 1024 * 1024 * 50    // 50MB
+        fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+        maxFileSize = 1024 * 1024 * 10, // 10MB
+        maxRequestSize = 1024 * 1024 * 50 // 50MB
 )
 
 public class VehiculeServlet extends HttpServlet {
@@ -49,6 +49,7 @@ public class VehiculeServlet extends HttpServlet {
     Proprietaire modelp = null;
     VehiculeDao dao = new VehiculeDao();
     ProprietaireDao pdao = new ProprietaireDao();
+
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
@@ -62,20 +63,21 @@ public class VehiculeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("opt");
-        if(action == null){
+
+        if (action == null) {
             try {
-                display(request,response);
+                display(request, response);
             } catch (SQLException ex) {
                 Logger.getLogger(VehiculeServlet.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }else{
+        } else {
             String id = request.getParameter("id");
-            switch(action){
-                case "search":{
+            switch (action) {
+                case "search": {
                     try {
                         Vehicule vehicule = dao.get(id);
-                        
-                        if(vehicule != null){
+
+                        if (vehicule != null) {
                             Proprietaire proprietaire = pdao.get(vehicule.getIdProprietaire());
                             if (proprietaire != null) {
                                 request.setAttribute("proprietaires", proprietaire);
@@ -83,7 +85,7 @@ public class VehiculeServlet extends HttpServlet {
                                 request.getRequestDispatcher("/vehicule/Recherche_Vehicule.jsp?").forward(request, response);
                             }
                         }
-                        
+
                     } catch (SQLException ex) {
                         Logger.getLogger(VehiculeServlet.class.getName()).log(Level.SEVERE, null, ex);
                     } catch (ClassNotFoundException ex) {
@@ -91,19 +93,21 @@ public class VehiculeServlet extends HttpServlet {
                     }
                     break;
                 }
-                case "mod":{
+                case "mod": {
                     try {
                         Vehicule vehicule = dao.get(id);
-                        
-                        if(vehicule != null){
+                        Vehicule vehicule2 = dao.get(id);
+
+                        if (vehicule != null) {
                             Proprietaire proprietaire = pdao.get(vehicule.getIdProprietaire());
                             if (proprietaire != null) {
                                 request.setAttribute("proprietaires", proprietaire);
                                 request.setAttribute("vehicules", vehicule);
+
                                 request.getRequestDispatcher("/vehicule/Modifier_Vehicule.jsp?").forward(request, response);
                             }
                         }
-                        
+
                     } catch (SQLException ex) {
                         Logger.getLogger(VehiculeServlet.class.getName()).log(Level.SEVERE, null, ex);
                     } catch (ClassNotFoundException ex) {
@@ -111,18 +115,23 @@ public class VehiculeServlet extends HttpServlet {
                     }
                     break;
                 }
-                case "sup":{
+                case "sup": {
                     try {
                         Vehicule vehicule = dao.get(id);
-                        
-                        if(vehicule != null){
-                            if(dao.delete(id) > 0){
-                                System.out.println("Suppression effectuee avec succes !");
-                                display(request,response);
-                            }else{
-                                System.out.println("Impossible de supprimer ce vehicule !");
+
+                        if (vehicule != null) {
+                            if (vehicule.calculeDifferenceHeure() < 14400) {
+                                if (dao.delete(id) > 0) {
+                                    System.out.println("Suppression effectuee avec succes !");
+                                    display(request, response);
+                                } else {
+                                    System.out.println("Impossible de supprimer ce vehicule !");
+                                }
+                            } else {
+                                System.out.println("Heure de suppression ecroule");
                             }
-                        }else{
+
+                        } else {
                             System.out.println("ID introuvable");
                         }
                     } catch (SQLException ex) {
@@ -132,18 +141,18 @@ public class VehiculeServlet extends HttpServlet {
                     }
                     break;
                 }
-                case "dalt":{
+                case "dalt": {
                     try {
                         Vehicule vehicule = dao.get(id);
-                        
-                        if(vehicule != null){
-                            if(dao.desactiverAlerte(vehicule) > 0){
+
+                        if (vehicule != null) {
+                            if (dao.desactiverAlerte(vehicule) > 0) {
                                 System.out.println("Desactivation de l'alerte effectuee avec succes !");
-                                display(request,response);
-                            }else{
+                                display(request, response);
+                            } else {
                                 System.out.println("Impossible de desactiver l'alerte de ce vehicule !");
                             }
-                        }else{
+                        } else {
                             System.out.println("ID introuvable");
                         }
                     } catch (SQLException ex) {
@@ -153,18 +162,18 @@ public class VehiculeServlet extends HttpServlet {
                     }
                     break;
                 }
-                case "alt":{
+                case "alt": {
                     try {
                         Vehicule vehicule = dao.get(id);
-                        
-                        if(vehicule != null){
-                            if(dao.activerAlerte(vehicule) > 0){
+
+                        if (vehicule != null) {
+                            if (dao.activerAlerte(vehicule) > 0) {
                                 System.out.println("Activation de l'alerte effectuee avec succes !");
-                                display(request,response);
-                            }else{
+                                display(request, response);
+                            } else {
                                 System.out.println("Impossible d'activer l'alerte de ce vehicule !");
                             }
-                        }else{
+                        } else {
                             System.out.println("ID introuvable");
                         }
                     } catch (SQLException ex) {
@@ -172,7 +181,6 @@ public class VehiculeServlet extends HttpServlet {
                     } catch (ClassNotFoundException ex) {
                         Logger.getLogger(VehiculeServlet.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    
                     break;
                 }
                 default:
@@ -194,34 +202,58 @@ public class VehiculeServlet extends HttpServlet {
             throws ServletException, IOException {
         String action = request.getParameter("opt");
         if (action == null) {
-            
+
         } else {
-           // String id=request.getParameter("id");
+            // String id=request.getParameter("id");
             switch (action) {
-                case "Enregistrer":
-                {
+                case "Enregistrer": {
                     try {
-                        save(request,response);
-                        display(request,response);
+                        save(request, response);
+                        display(request, response);
                     } catch (SQLException ex) {
                         Logger.getLogger(VehiculeServlet.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     break;
-                } 
-                case "Modifier":
-                {
+                }
+                case "Modifier": {
                     try {
-                        update(request,response);
-                        display(request,response);
+                        update(request, response);
+                        display(request, response);
                     } catch (SQLException ex) {
                         Logger.getLogger(VehiculeServlet.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     break;
-                } 
-                default:
-                {
+                }
+                case "Recherche": {
+                    String idV = request.getParameter("id1");
+                    if (!idV.isEmpty()) {
+                        try {
+                            Vehicule vehicule = dao.get(idV);
+                            if (vehicule.getId() != null) {
+                                Proprietaire proprietaire = pdao.get(vehicule.getIdProprietaire());
+                                if(proprietaire.getId()!=null){
+                                    request.setAttribute("proprietaires", proprietaire);
+                                    request.setAttribute("vehicules", vehicule);
+                                    request.getRequestDispatcher("/vehicule/Recherche_Vehicule.jsp?").forward(request, response);
+                                }
+                            } else {
+                                request.setAttribute("error", "Aucun vehicule trouve!!!");
+                                request.getRequestDispatcher("/vehicule/Modifier_Vehicule.jsp?").forward(request, response);
+                            }
+                        } catch (SQLException ex) {
+                            Logger.getLogger(AssuranceServlet.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (ClassNotFoundException ex) {
+                            Logger.getLogger(AssuranceServlet.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    } else {
+                        request.setAttribute("error", "Une erreur s'est produite");
+                        request.getRequestDispatcher("/vehicule/Modifier_Vehicule.jsp?").forward(request, response);
+                    }
+                    break;
+                }
+                default: {
                     try {
-                        display(request,response);
+                        display(request, response);
                     } catch (SQLException ex) {
                         Logger.getLogger(VehiculeServlet.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -230,60 +262,59 @@ public class VehiculeServlet extends HttpServlet {
             }
         }
     }
-    
+
     protected void save(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         model = new Vehicule();
         modelp = new Proprietaire();
         // Map pour stocker les messages d'erreur
         Map<String, String> errors = new HashMap<>();
-        
-        if(!request.getParameter("marque").isEmpty()){
+
+        if (!request.getParameter("marque").isEmpty()) {
             model.setMarque(request.getParameter("marque"));
         } else {
             errors.put("marque", "Erreur d'insertion");
         }
-        if(!request.getParameter("modele").isEmpty()){
+        if (!request.getParameter("modele").isEmpty()) {
             model.setModele(request.getParameter("modele"));
         } else {
             errors.put("modele", "Erreur d'insertion");
         }
-        if(!request.getParameter("couleur").isEmpty()){
+        if (!request.getParameter("couleur").isEmpty()) {
             model.setCouleur(request.getParameter("couleur"));
         } else {
             errors.put("couleur", "Erreur d'insertion");
         }
-        
-        if(!request.getParameter("noMoteur").isEmpty()){
+
+        if (!request.getParameter("noMoteur").isEmpty()) {
             model.setNoMoteur(request.getParameter("noMoteur"));
         } else {
             errors.put("noMoteur", "Erreur d'insertion");
         }
-        
-        if(testRegex(request.getParameter("nbCylindre"), "^\\d+$")){
+
+        if (testRegex(request.getParameter("nbCylindre"), "^\\d+$")) {
             model.setNbCylindre(Integer.parseInt(request.getParameter("nbCylindre")));
-        }else{
+        } else {
             errors.put("nbCylindre", "Erreur d'insertion");
         }
-        
-        if(!request.getParameter("typeTransmission").isEmpty()){
+
+        if (!request.getParameter("typeTransmission").isEmpty()) {
             model.setTypeTransmission(request.getParameter("typeTransmission"));
         } else {
             errors.put("typeTransmission", "Erreur d'insertion");
         }
-        
-        if(!request.getParameter("typeEssence").isEmpty()){
+
+        if (!request.getParameter("typeEssence").isEmpty()) {
             model.setTypeEssence(request.getParameter("typeEssence"));
         } else {
             errors.put("typeEssence", "Erreur d'insertion");
         }
         // Récupérez et traitez les autres paramètres ici
-        
+
         // Récupérez l'image
         Part filePart = request.getPart("photo");
         if (filePart != null) {
-            try (InputStream inputStream = filePart.getInputStream();
-                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            try (InputStream inputStream = filePart.getInputStream(); ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
                 byte[] buffer = new byte[1024];
                 int bytesRead;
                 while ((bytesRead = inputStream.read(buffer)) != -1) {
@@ -291,158 +322,177 @@ public class VehiculeServlet extends HttpServlet {
                 }
                 model.setPhotoVehicule(byteArrayOutputStream.toByteArray());
             }
-        } else{
+        } else {
             errors.put("photo", "Erreur d'insertion");
         }
-        
-        if(!request.getParameter("plaqueImmatriculation").isEmpty()){
+
+        if (!request.getParameter("plaqueImmatriculation").isEmpty()) {
             model.setPlaqueImmatriculation(request.getParameter("plaqueImmatriculation"));
         } else {
             errors.put("plaqueImmatriculation", "Erreur d'insertion");
         }
-        
-        if(testRegex(request.getParameter("nomProprietaire"), "^[A-Z]+(?:[- ][A-Z]+)*$")){
+
+        if (testRegex(request.getParameter("nomProprietaire").toUpperCase(), "^[A-Z]+(?:[- ][A-Z]+)*$")) {
             modelp.setNom(request.getParameter("nomProprietaire"));
-        }else{
+        } else {
             errors.put("nomProprietaire", "Erreur d'insertion");
         }
-        
-        if(testRegex(request.getParameter("prenomProprietaire"), "^[A-Z][a-zÀ-ÿ]*(?:[-\\s][A-Z][a-zÀ-ÿ]*)*$")){
+
+        if (testRegex(Proprietaire.prenom(request.getParameter("prenomProprietaire")), "^[A-Z][a-zÀ-ÿ]*(?:[-\\s][A-Z][a-zÀ-ÿ]*)*$")) {
             modelp.setPrenom(request.getParameter("prenomProprietaire"));
-        }else{
+        } else {
             errors.put("prenomProprietaire", "Erreur d'insertion");
         }
-        
-        if(!request.getParameter("sexeProprietaire").isEmpty()){
+
+        if (!request.getParameter("sexeProprietaire").isEmpty()) {
             modelp.setSexe(request.getParameter("sexeProprietaire"));
         } else {
             errors.put("sexeProprietaire", "Erreur d'insertion");
         }
-        
-        if(testRegex(request.getParameter("telProprietaire"), "^(3[0-9]|4[0-46-9]|55)\\d{6}$")){
+
+        if (testRegex(request.getParameter("telProprietaire"), "^(3[0-9]|4[0-46-9]|55)\\d{6}$")) {
             modelp.setTel(request.getParameter("telProprietaire"));
-        }else{
+        } else {
             errors.put("telProprietaire", "Erreur d'insertion");
         }
-        
-        if(!request.getParameter("adresseProprietaire").isEmpty()){
+
+        if (!request.getParameter("adresseProprietaire").isEmpty()) {
             modelp.setAdresse(request.getParameter("adresseProprietaire"));
         } else {
             errors.put("adresseProprietaire", "Erreur d'insertion");
         }
-        
-        if(!request.getParameter("typePieceProp").isEmpty()){
+
+        if (!request.getParameter("typePieceProp").isEmpty()) {
             modelp.setTypePiece(request.getParameter("typePieceProp"));
         } else {
             errors.put("typePieceProp", "Erreur d'insertion");
         }
-        
-        if(!request.getParameter("noPiece").isEmpty()){
+
+        if (!request.getParameter("noPiece").isEmpty()) {
             modelp.setNoPiece(request.getParameter("noPiece"));
         } else {
             errors.put("noPiece", "Erreur d'insertion");
         }
-        
-        if(testRegex(request.getParameter("annee"), "^\\d{4}$")){
+
+        if (testRegex(request.getParameter("annee"), "^\\d{4}$")) {
             model.setAnnee(Integer.parseInt(request.getParameter("annee")));
-        }else{
+        } else {
             errors.put("annee", "Erreur d'insertion");
         }
-        
-        
-        if(request.getParameter("alerte") != null){
-            if(request.getParameter("alerte").equalsIgnoreCase("true")){
+
+        if (request.getParameter("alerte") != null) {
+            if (request.getParameter("alerte").equalsIgnoreCase("true")) {
                 model.setAlerte(true);
-            }
-            else{
+            } else {
                 model.setAlerte(false);
             }
         }
-        
-        if(testRegex(request.getParameter("courrielProprietaire"), "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")){
+
+        if (testRegex(request.getParameter("courrielProprietaire"), "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
             modelp.setCourriel(request.getParameter("courrielProprietaire"));
-        }else{
+        } else {
             errors.put("courrielProprietaire", "Erreur d'insertion");
         }
-        
-        if(!errors.isEmpty()){
+
+        if (!errors.isEmpty()) {
             request.setAttribute("errors", errors);
             // Redirection vers la page du formulaire
             request.getRequestDispatcher("/vehicule/Enregistrement_Vehicule.jsp").forward(request, response);
-        }else{
+        } else {
             try {
-                String idProprietaire = pdao.saveP(modelp);
-                if(idProprietaire != null){
+                String idProprietaire = pdao.getExist(modelp.getTypePiece(), modelp.getNoPiece());
+                if (idProprietaire == null) {
+                    idProprietaire = pdao.saveP(modelp);
+                }
+                if (idProprietaire != null) {
                     try {
                         if (dao.saveV(model, idProprietaire) > 0) {
                             System.out.println("OK!!!");
                         }
-                    }catch (ClassNotFoundException ex) {
+                    } catch (ClassNotFoundException ex) {
                         System.out.println("Erreur 2:" + ex.getMessage());
+                    } catch (SQLIntegrityConstraintViolationException ex) {
+                        System.out.println("Impossible de donnee une meme plaque d'imm a deux vehicule");
                     }
                 }
             } catch (ClassNotFoundException ex) {
                 System.out.println("Erreur Proprietaire:" + ex.getMessage());
+            } catch (SQLIntegrityConstraintViolationException ex) {
+                System.out.println("Impossible de donnee un meme courriel a deux personnes");
+            } catch (SQLException ex) {
+                System.out.println("Impossible de faire la mise a jour une erreur a ete soulever");
             }
-        }      
+        }
     }
-    
-        protected void update(HttpServletRequest request, HttpServletResponse response)
+
+    protected void update(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         model = new Vehicule();
         modelp = new Proprietaire();
         // Map pour stocker les messages d'erreur
         Map<String, String> errors = new HashMap<>();
-        
+
         model.setId(request.getParameter("id"));
         modelp.setId(request.getParameter("id2"));
-        
-        if(!request.getParameter("marque").isEmpty()){
+
+        Vehicule model2 = null;
+        try {
+            model2 = dao.get(model.getId());
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(VehiculeServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        Proprietaire modelp2 = null;
+        try {
+            modelp2 = pdao.get(modelp.getId());
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(VehiculeServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        if (!request.getParameter("marque").isEmpty()) {
             model.setMarque(request.getParameter("marque"));
         } else {
             errors.put("marque", "Erreur d'insertion");
         }
-        if(!request.getParameter("modele").isEmpty()){
+        if (!request.getParameter("modele").isEmpty()) {
             model.setModele(request.getParameter("modele"));
         } else {
             errors.put("modele", "Erreur d'insertion");
         }
-        if(!request.getParameter("couleur").isEmpty()){
+        if (!request.getParameter("couleur").isEmpty()) {
             model.setCouleur(request.getParameter("couleur"));
         } else {
             errors.put("couleur", "Erreur d'insertion");
         }
-        
-        if(!request.getParameter("noMoteur").isEmpty()){
+
+        if (!request.getParameter("noMoteur").isEmpty()) {
             model.setNoMoteur(request.getParameter("noMoteur"));
         } else {
             errors.put("noMoteur", "Erreur d'insertion");
         }
-        
-        if(testRegex(request.getParameter("nbCylindre"), "^\\d+$")){
+
+        if (testRegex(request.getParameter("nbCylindre"), "^\\d+$")) {
             model.setNbCylindre(Integer.parseInt(request.getParameter("nbCylindre")));
-        }else{
+        } else {
             errors.put("nbCylindre", "Erreur d'insertion");
         }
-        
-        if(!request.getParameter("typeTransmission").isEmpty()){
+
+        if (!request.getParameter("typeTransmission").isEmpty()) {
             model.setTypeTransmission(request.getParameter("typeTransmission"));
         } else {
             errors.put("typeTransmission", "Erreur d'insertion");
         }
-        
-        if(!request.getParameter("typeEssence").isEmpty()){
+
+        if (!request.getParameter("typeEssence").isEmpty()) {
             model.setTypeEssence(request.getParameter("typeEssence"));
         } else {
             errors.put("typeEssence", "Erreur d'insertion");
         }
         // Récupérez et traitez les autres paramètres ici
-        
+
         // Récupérez l'image
         Part filePart = request.getPart("photo");
         if (filePart != null) {
-            try (InputStream inputStream = filePart.getInputStream();
-                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            try (InputStream inputStream = filePart.getInputStream(); ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
                 byte[] buffer = new byte[1024];
                 int bytesRead;
                 while ((bytesRead = inputStream.read(buffer)) != -1) {
@@ -450,137 +500,147 @@ public class VehiculeServlet extends HttpServlet {
                 }
                 model.setPhotoVehicule(byteArrayOutputStream.toByteArray());
             }
-        } else{
+        } else {
             errors.put("photo", "Erreur d'insertion");
         }
-        
-        if(!request.getParameter("plaqueImmatriculation").isEmpty()){
+
+        if (!request.getParameter("plaqueImmatriculation").isEmpty()) {
             model.setPlaqueImmatriculation(request.getParameter("plaqueImmatriculation"));
         } else {
             errors.put("plaqueImmatriculation", "Erreur d'insertion");
         }
-        
-        if(testRegex(request.getParameter("nomProprietaire"), "^[A-Z]+(?:[- ][A-Z]+)*$")){
+
+        if (testRegex(request.getParameter("nomProprietaire").toUpperCase(), "^[A-Z]+(?:[- ][A-Z]+)*$")) {
             modelp.setNom(request.getParameter("nomProprietaire"));
-        }else{
+        } else {
             errors.put("nomProprietaire", "Erreur d'insertion");
         }
-        
-        if(testRegex(request.getParameter("prenomProprietaire"), "^[A-Z][a-zÀ-ÿ]*(?:[-\\s][A-Z][a-zÀ-ÿ]*)*$")){
+
+        if (testRegex(Proprietaire.prenom(request.getParameter("prenomProprietaire")), "^[A-Z][a-zÀ-ÿ]*(?:[-\\s][A-Z][a-zÀ-ÿ]*)*$")) {
             modelp.setPrenom(request.getParameter("prenomProprietaire"));
-        }else{
+        } else {
             errors.put("prenomProprietaire", "Erreur d'insertion");
         }
-        
-        if(!request.getParameter("sexeProprietaire").isEmpty()){
+
+        if (!request.getParameter("sexeProprietaire").isEmpty()) {
             modelp.setSexe(request.getParameter("sexeProprietaire"));
         } else {
             errors.put("sexeProprietaire", "Erreur d'insertion");
         }
-        
-        if(testRegex(request.getParameter("telProprietaire"), "^(3[0-9]|4[0-46-9]|55)\\d{6}$")){
+
+        if (testRegex(request.getParameter("telProprietaire"), "^(3[0-9]|4[0-46-9]|55)\\d{6}$")) {
             modelp.setTel(request.getParameter("telProprietaire"));
-        }else{
+        } else {
             errors.put("telProprietaire", "Erreur d'insertion");
         }
-        
-        if(!request.getParameter("adresseProprietaire").isEmpty()){
+
+        if (!request.getParameter("adresseProprietaire").isEmpty()) {
             modelp.setAdresse(request.getParameter("adresseProprietaire"));
         } else {
             errors.put("adresseProprietaire", "Erreur d'insertion");
         }
-        
-        if(!request.getParameter("typePieceProp").isEmpty()){
+
+        if (!request.getParameter("typePieceProp").isEmpty()) {
             modelp.setTypePiece(request.getParameter("typePieceProp"));
         } else {
             errors.put("typePieceProp", "Erreur d'insertion");
         }
-        
-        if(!request.getParameter("noPiece").isEmpty()){
+
+        if (!request.getParameter("noPiece").isEmpty()) {
             modelp.setNoPiece(request.getParameter("noPiece"));
         } else {
             errors.put("noPiece", "Erreur d'insertion");
         }
-        
-        if(testRegex(request.getParameter("annee"), "^\\d{4}$")){
+
+        if (testRegex(request.getParameter("annee"), "^\\d{4}$")) {
             model.setAnnee(Integer.parseInt(request.getParameter("annee")));
-        }else{
+        } else {
             errors.put("annee", "Erreur d'insertion");
         }
-        
-        
-        if(request.getParameter("alerte") != null){
-            if(request.getParameter("alerte").equalsIgnoreCase("true")){
+
+        if (request.getParameter("alerte") != null) {
+            if (request.getParameter("alerte").equalsIgnoreCase("true")) {
                 model.setAlerte(true);
-            }
-            else{
+            } else {
                 model.setAlerte(false);
             }
         }
-        
-        if(testRegex(request.getParameter("courrielProprietaire"), "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")){
+
+        if (testRegex(request.getParameter("courrielProprietaire"), "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
             modelp.setCourriel(request.getParameter("courrielProprietaire"));
-        }else{
+        } else {
             errors.put("courrielProprietaire", "Erreur d'insertion");
         }
-        
-        /*if(!request.getParameter("dateAlerte").isEmpty()){
-            LocalDate dateAlerte = LocalDate.parse(request.getParameter("dateAlerte"), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            model.setDateAlerte(dateAlerte);
-        }else{
-            model.setDateAlerte(null);
-        }*/
-        
-        if(!errors.isEmpty()){
+        if (!errors.isEmpty()) {
+            request.setAttribute("V2", model2);
+            request.setAttribute("P2", modelp2);
             request.setAttribute("errors", errors);
             // Redirection vers la page du formulaire
             request.getRequestDispatcher("/vehicule/Modifier_Vehicule.jsp").forward(request, response);
-        }else{
+        } else {
             try {
-                if (pdao.update(modelp) > 0) {
-                    System.out.println("OK!!!");
+                String idProprietaire = pdao.getExist(modelp.getTypePiece(), modelp.getNoPiece());
+                String idProprietaire2 = pdao.getExist(modelp.getTypePiece(), modelp.getNoPiece(), modelp.getId());
+                if (idProprietaire == null) {
+                    if (pdao.update(modelp) > 0) {
+                        System.out.println("OK!!!");
+                    }
                 }
-            }catch (ClassNotFoundException ex) {
+                if (idProprietaire2 != null) {
+                    if (pdao.update(modelp) > 0) {
+                        System.out.println("OK!!!");
+                    }
+                }
+            } catch (ClassNotFoundException ex) {
                 System.out.println("Erreur 2:" + ex.getMessage());
+            } catch (SQLIntegrityConstraintViolationException ex) {
+                System.out.println("Impossible de donnee un meme courriel a deux personnes");
+            } catch (SQLException ex) {
+                System.out.println("Impossible de faire la mise a jour une erreur a ete soulever");
             }
             try {
                 if (dao.update(model) > 0) {
-                    
+
                     System.out.println("OK!!!");
                 }
-            }catch (ClassNotFoundException ex) {
+            } catch (ClassNotFoundException ex) {
                 System.out.println("Erreur 2:" + ex.getMessage());
+            } catch (SQLIntegrityConstraintViolationException ex) {
+                System.out.println("Impossible de donnee une meme plaque d'imm a deux vehicule");
+            } catch (SQLException ex) {
+                System.out.println("Impossible de faire la mise a jour une erreur a ete soulever");
             }
-        }      
+        }
     }
-    
+
     protected void display(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         try {
             List<Proprietaire> listeP = pdao.getAll();
             List<Vehicule> liste = dao.getAll();
-            
+
             request.setAttribute("proprietaires", listeP);
             request.setAttribute("vehicules", liste);
-            
-            // redirection vers la page afficher
-            request.getRequestDispatcher("/vehicule/Afficher_Vehicule.jsp?").forward(request, response);
+            if (!response.isCommitted()) {
+                // redirection vers la page afficher
+                request.getRequestDispatcher("/vehicule/Afficher_Vehicule.jsp?").forward(request, response);
+            }
         } catch (SQLException ex) {
             System.out.println("Erreur 1:" + ex.getMessage());
 
-        }catch (ClassNotFoundException ex) {
+        } catch (ClassNotFoundException ex) {
             Logger.getLogger(VehiculeServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    private boolean testRegex(String str1, String str2){
-        
+
+    private boolean testRegex(String str1, String str2) {
+
         // Compile le regex en un objet Pattern
         Pattern pattern = Pattern.compile(str2);
-        
+
         // Crée un objet Matcher pour effectuer la correspondance
         Matcher matcher = pattern.matcher(str1);
-        
+
         return matcher.matches();
     }
 
